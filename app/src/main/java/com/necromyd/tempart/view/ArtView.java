@@ -1,5 +1,4 @@
 package com.necromyd.tempart.view;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;

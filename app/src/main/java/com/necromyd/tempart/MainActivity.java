@@ -1,188 +1,44 @@
 package com.necromyd.tempart;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.SeekBar;
 
-import com.necromyd.tempart.view.ArtView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ArtView artView;
-    private AlertDialog.Builder currentAlertDialog;
-    private ImageView widthImageView;
-    private AlertDialog dialogLineWidth;
-    private AlertDialog colorDialog;
-    private SeekBar alphaSeekBar;
-    private SeekBar redSeekBar;
-    private SeekBar greenSeekBar;
-    private SeekBar blueSeekBar;
-    private View colorView;
+    Button newArt, gallery;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        newArt = (Button) findViewById(R.id.btn_mainArt);
+        gallery = (Button) findViewById(R.id.btn_mainGallery);
+        newArt.setOnClickListener(this);
+        gallery.setOnClickListener(this);
 
-        artView = findViewById(R.id.artView);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.clearid:
-                artView.clear();
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_mainArt:
+                Intent a = new Intent(getApplicationContext(), ArtActivity.class);
+                startActivity(a);
                 break;
-            case R.id.saveid:
-                artView.saveImage();
-                break;
-            case R.id.colorid:
-                showColorDialog();
-                break;
-            case R.id.lineWidth:
-                showLineWidthDialog();
-                break;
-            case R.id.eraseid:
+            case R.id.btn_mainGallery:
+                Intent b = new Intent(getApplicationContext(), GalleryActivity.class);
+                startActivity(b);
                 break;
         }
-        return super.onOptionsItemSelected(item);
     }
-
-    void showLineWidthDialog() {
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.width_dialog, null);
-        final SeekBar widthSeekbar = view.findViewById(R.id.seekBarId);
-        widthSeekbar.setProgress(artView.getLineWidth());
-        Button setLineWidthButton = view.findViewById(R.id.buttonDialogId);
-        widthImageView = view.findViewById(R.id.imageViewId);
-        setLineWidthButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setLineWidth(widthSeekbar.getProgress());
-                dialogLineWidth.dismiss();
-                currentAlertDialog = null;
-            }
-        });
-
-        widthSeekbar.setOnSeekBarChangeListener(widthSeekBarChange);
-        currentAlertDialog.setView(view);
-        dialogLineWidth = currentAlertDialog.create();
-        dialogLineWidth.setTitle("Set Line Width");
-        dialogLineWidth.show();
-    }
-
-    void showColorDialog(){
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
-        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
-        redSeekBar = view.findViewById(R.id.redSeekBar);
-        greenSeekBar = view.findViewById(R.id.greenSeekBar);
-        blueSeekBar = view.findViewById(R.id.blueSeekBar);
-        colorView = view.findViewById(R.id.colorView);
-
-        //register SeekBar event Listeners
-        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-
-        int color = artView.getDrawingColor();
-        alphaSeekBar.setProgress(Color.alpha(color));
-        redSeekBar.setProgress(Color.red(color));
-        greenSeekBar.setProgress(Color.green(color));
-        blueSeekBar.setProgress(Color.blue(color));
-
-        Button setColorButton = view.findViewById(R.id.setColorButton);
-        setColorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setDrawingColor(Color.argb(
-                        alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(),blueSeekBar.getProgress()
-                ));
-
-                colorDialog.dismiss();
-            }
-        });
-
-        currentAlertDialog.setView(view);
-        currentAlertDialog.setTitle("Choose Color");
-        colorDialog = currentAlertDialog.create();
-        colorDialog.show();
-    }
-
-    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener(){
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            artView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
-            ));
-
-            //display the current color
-            colorView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
-            ));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
-        Bitmap bitmap = Bitmap.createBitmap(300,100, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            Paint p = new Paint();
-            p.setColor(artView.getDrawingColor());
-            p.setStrokeCap(Paint.Cap.ROUND);
-            p.setStrokeWidth(progress);
-
-            bitmap.eraseColor(Color.WHITE);
-            canvas.drawLine(10,50, 287,50, p);
-            widthImageView.setImageBitmap(bitmap);
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
 }
