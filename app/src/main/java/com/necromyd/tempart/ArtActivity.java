@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +33,8 @@ public class ArtActivity extends AppCompatActivity {
     private SeekBar greenSeekBar;
     private SeekBar blueSeekBar;
     private View colorView;
+    private boolean imageSaved;
+    private static final String TAG = "ArtActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,7 @@ public class ArtActivity extends AppCompatActivity {
         setContentView(R.layout.activity_art);
 
         artView = findViewById(R.id.artView);
+        imageSaved = false;
     }
 
     @Override
@@ -185,4 +190,80 @@ public class ArtActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        if(artView.getPathMap().isEmpty()){
+            Intent c = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(c);
+        }else{
+            currentAlertDialog = new AlertDialog.Builder(this);
+            currentAlertDialog.setCancelable(false);
+            View view = getLayoutInflater().inflate(R.layout.back_button_dialog, null);
+            Button yesButton = view.findViewById(R.id.btn_dialogYes);
+            Button noButton = view.findViewById(R.id.btn_dialogNo);
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    artView.saveImage();
+                    imageSaved = true;
+                    dialogLineWidth.dismiss();
+                    currentAlertDialog = null;
+                    Intent a = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(a);
+                }
+            });
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    imageSaved = true;
+                    dialogLineWidth.dismiss();
+                    currentAlertDialog = null;
+                    Intent a = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(a);
+                }
+            });
+
+            currentAlertDialog.setView(view);
+            dialogLineWidth = currentAlertDialog.create();
+            dialogLineWidth.setTitle("Save image before exiting ?");
+            dialogLineWidth.show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause");
+        if(!artView.getPathMap().isEmpty()){
+            if(!imageSaved){
+                artView.saveImage();
+                imageSaved = true;
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+        if(!artView.getPathMap().isEmpty()){
+            if(!imageSaved){
+                artView.saveImage();
+                imageSaved = true;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
+        if(!artView.getPathMap().isEmpty()){
+            if(!imageSaved){
+                artView.saveImage();
+                imageSaved = true;
+            }
+        }
+    }
 }

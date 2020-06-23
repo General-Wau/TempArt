@@ -47,6 +47,10 @@ public class ArtView extends View {
         init();
     }
 
+    public HashMap<Integer,Path> getPathMap(){
+        return pathMap;
+    }
+
     void init() {
         paintScreen = new Paint();
 
