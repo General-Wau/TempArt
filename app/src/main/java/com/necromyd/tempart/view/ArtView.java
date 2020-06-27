@@ -1,4 +1,5 @@
 package com.necromyd.tempart.view;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -41,6 +42,7 @@ public class ArtView extends View {
     private Paint paintLine;
     private HashMap<Integer, Path> pathMap;
     private HashMap<Integer, Point> previousPointMap;
+    public static String path;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -187,11 +189,13 @@ public class ArtView extends View {
         point.y = (int) y;
     }
 
+   @SuppressLint("WrongThread")
    public void saveImage() {
        ContextWrapper cw = new ContextWrapper(getContext());
        String filename = "TempART" + System.currentTimeMillis();
        // path to /data/data/yourapp/app_data/imageDir
-       File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+       File directory = cw.getDir("files", Context.MODE_PRIVATE);
+       path = cw.getDir("files", Context.MODE_PRIVATE).toString();
        // create imageDir
        File myPath = new File(directory, filename + ".jpg");
 
@@ -208,7 +212,7 @@ public class ArtView extends View {
                fileOutputStream.close();
                Log.d("Image:", directory.getAbsolutePath());
                Toast message = Toast.makeText(getContext(),"Image Saved +" + directory.getAbsolutePath(), Toast.LENGTH_LONG);
-               message.setGravity(Gravity.CENTER, message.getXOffset() / 2 , message.getYOffset() / 2);
+               message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2 , message.getYOffset() / 2);
                message.show();
            }catch (IOException e){
                e.printStackTrace();
@@ -216,15 +220,5 @@ public class ArtView extends View {
        }
    }
 
-   private void loadImage(String path) {
-        try {
-            File file = new File(path, "profile.jpg");
-            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-//            ImageView imageView = (ImageView)findViewById(R.id.imageViewSelect);
-//            imageView.setImageBitmap(bitmap);
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }
-   }
 
 }
