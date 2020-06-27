@@ -72,14 +72,16 @@ public class GalleryActivity extends AppCompatActivity {
     // load all the files from the folder
     private List<Cell> listAllFiles(String pathName){
         List<Cell> allFiles = new ArrayList<>();
-        File file = new File(pathName);
-        File[] files = file.listFiles();
-        if(files != null){
-            for (File f : files){
-                Cell cell = new Cell();
-                cell.setTitle(f.getName());
-                cell.setPath(f.getAbsolutePath());
-                allFiles.add(cell);
+        if(pathName != null){
+            File file = new File(pathName);
+            File[] files = file.listFiles();
+            if(files != null){
+                for (File f : files){
+                    Cell cell = new Cell();
+                    cell.setTitle(f.getName());
+                    cell.setPath(f.getAbsolutePath());
+                    allFiles.add(cell);
+                }
             }
         }
         return allFiles;
@@ -92,7 +94,7 @@ public class GalleryActivity extends AppCompatActivity {
                 //show images
                 showImages();
             }else {
-                Toast.makeText(this,"Permission not granted!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission not granted!", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
