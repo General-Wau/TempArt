@@ -24,6 +24,7 @@ import java.util.List;
 public class GalleryActivity extends AppCompatActivity {
 
     List <Cell> allFilesPaths;
+    String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +37,15 @@ public class GalleryActivity extends AppCompatActivity {
         }else{
             showImages();
         }
+
+
     }
 
     // show the images on the screen
     private void showImages(){
         // this is the folder with all the images
-        String path = ArtView.path;
+        ContextWrapper cw = new ContextWrapper(this);
+        path = cw.getDir("files", Context.MODE_PRIVATE).toString();
         allFilesPaths = new ArrayList<>();
         allFilesPaths = listAllFiles(path);
 

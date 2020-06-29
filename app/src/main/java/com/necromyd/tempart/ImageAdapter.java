@@ -1,27 +1,27 @@
 package com.necromyd.tempart;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     private ArrayList<Cell> galleryList;
     private Context context;
+    private static final String TAG = "ImageAdapter";
 
     public ImageAdapter(Context context, ArrayList<Cell> galleryList) {
         this.context = context;
@@ -38,12 +38,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, final int position) {
         holder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Log.d(TAG, "onBindViewHolder: " + galleryList.size());
         setImageFromPath(galleryList.get(position).getPath(), holder.img);
         holder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // do something
-                Toast.makeText(context, "" + galleryList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+
+                String path = galleryList.get(position).getPath();
+                Intent intent = new Intent(context ,ImagePreview.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("imagePath",path);
+                context.startActivity(intent);
+//                Toast.makeText(context, "" + galleryList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -68,12 +74,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         File imgFile = new File(path);
 
         try {
-            if(imgFile.exists()){
                 Bitmap myBitmap = BitmapFactory.decodeStream(new FileInputStream(imgFile));
                 image.setImageBitmap(myBitmap);
                 //            ImageView imageView = (ImageView)findViewById(R.id.imageViewSelect);
-//            imageView.setImageBitmap(bitmap);
-            }
+                //            imageView.setImageBitmap(bitmap);
         }catch (FileNotFoundException e){
             e.printStackTrace();
         }

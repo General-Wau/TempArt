@@ -14,6 +14,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".GalleryActivity"></activity>
         <activity android:name=".ArtActivity"></activity>
+        <activity android:name=".ImagePreview"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
