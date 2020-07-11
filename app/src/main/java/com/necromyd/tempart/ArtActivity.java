@@ -194,8 +194,9 @@ public class ArtActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(artView.getPathMap().isEmpty()){
-            Intent c = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(c);
+//            Intent c = new Intent(getApplicationContext(), MainActivity.class);
+//            startActivity(c);
+            super.onBackPressed();
         }else{
             currentAlertDialog = new AlertDialog.Builder(this);
             currentAlertDialog.setCancelable(false);
@@ -209,8 +210,7 @@ public class ArtActivity extends AppCompatActivity {
                     imageSaved = true;
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
-                    Intent a = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(a);
+                    ArtActivity.super.onBackPressed();
                 }
             });
             noButton.setOnClickListener(new View.OnClickListener() {
@@ -219,8 +219,7 @@ public class ArtActivity extends AppCompatActivity {
                     imageSaved = true;
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
-                    Intent a = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(a);
+                    ArtActivity.super.onBackPressed();
                 }
             });
 
