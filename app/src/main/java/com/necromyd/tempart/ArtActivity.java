@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -43,6 +44,15 @@ public class ArtActivity extends AppCompatActivity {
 
         artView = findViewById(R.id.artView);
         imageSaved = false;
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if (extras.getString("image") != null) {
+                String path = extras.getString("image");
+                Bitmap myBitmap = BitmapFactory.decodeFile(path);
+                artView.setBitmapCanvas(myBitmap);
+            }
+        }
     }
 
     @Override

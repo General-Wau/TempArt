@@ -1,4 +1,5 @@
 package com.necromyd.tempart.view;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,7 +36,6 @@ import java.util.HashMap;
 public class ArtView extends View {
 
     public static final float TOUCH_TOLERANCE = 10;
-
     private Bitmap bitmap;
     private Canvas bitmapCanvas;
     private Paint paintScreen;
@@ -49,8 +49,13 @@ public class ArtView extends View {
         init();
     }
 
-    public HashMap<Integer,Path> getPathMap(){
+
+    public HashMap<Integer, Path> getPathMap() {
         return pathMap;
+    }
+
+    public void setBitmapCanvas(Bitmap bmap) {
+        bitmap = bmap;
     }
 
     void init() {
@@ -71,11 +76,11 @@ public class ArtView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(bitmap, 0, 0, paintScreen);
-
-        for(Integer key: pathMap.keySet()){
+        for (Integer key : pathMap.keySet()) {
             canvas.drawPath(pathMap.get(key), paintLine);
         }
     }
+
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -85,18 +90,18 @@ public class ArtView extends View {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
+    public boolean onTouchEvent(MotionEvent event) {
 
         int action = event.getActionMasked(); // event type
         int actionIndex = event.getActionIndex(); // pointer (finger , mouse)
 
-        if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_UP){
+        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_UP) {
             touchStarted(event.getX(actionIndex),
                     event.getY(actionIndex),
                     event.getPointerId(actionIndex));
-        }else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP){
+        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
             touchEnded(event.getPointerId(actionIndex));
-        }else{
+        } else {
             touchMoved(event);
         }
 
@@ -104,14 +109,14 @@ public class ArtView extends View {
         return true;
     }
 
-    private void touchMoved(MotionEvent event){
+    private void touchMoved(MotionEvent event) {
 
-        for (int i = 0; i < event.getPointerCount(); i++){
+        for (int i = 0; i < event.getPointerCount(); i++) {
 
             int pointerId = event.getPointerId(i);
             int pointerIndex = event.findPointerIndex(pointerId);
 
-            if (pathMap.containsKey(pointerId)){
+            if (pathMap.containsKey(pointerId)) {
                 float newX = event.getX(pointerIndex);
                 float newY = event.getY(pointerIndex);
 
@@ -124,14 +129,14 @@ public class ArtView extends View {
                 float deltaY = Math.abs(newY - point.y);
 
                 //if the distance is significant enough to be considered movement
-                if(deltaX >= TOUCH_TOLERANCE || deltaY >= TOUCH_TOLERANCE){
+                if (deltaX >= TOUCH_TOLERANCE || deltaY >= TOUCH_TOLERANCE) {
                     // move the path to the new location
-                    if(event.getX() < 0 | event.getX() > bitmapCanvas.getWidth()){
+                    if (event.getX() < 0 | event.getX() > bitmapCanvas.getWidth()) {
                         break;
                     }
-                    path.quadTo(point.x , point.y,
-                            (newX + point.x)/2,
-                            (newY + point.y)/2);
+                    path.quadTo(point.x, point.y,
+                            (newX + point.x) / 2,
+                            (newY + point.y) / 2);
 
                     //store the new coordinates
                     point.x = (int) newX;
@@ -142,41 +147,43 @@ public class ArtView extends View {
     }
 
 
-    public void setDrawingColor(int color){
+    public void setDrawingColor(int color) {
         paintLine.setColor(color);
     }
 
-    public int getDrawingColor(){
+    public int getDrawingColor() {
         return paintLine.getColor();
     }
 
-    public void setLineWidth(int width){
+    public void setLineWidth(int width) {
         paintLine.setStrokeWidth(width);
     }
 
-    public int getLineWidth(){
+    public int getLineWidth() {
         return (int) paintLine.getStrokeWidth();
     }
 
-    public void clear(){
+    public void clear() {
         pathMap.clear(); // removes all of the paths
         previousPointMap.clear();
         bitmap.eraseColor(Color.WHITE);
         invalidate(); // refresh the screen
     }
-    private void touchEnded(int pointerId){
+
+    private void touchEnded(int pointerId) {
         Path path = pathMap.get(pointerId); // get corresponding path
         bitmapCanvas.drawPath(path, paintLine); // draw to bitmapCanvas
         path.reset();
     }
-    private void touchStarted(float x, float y, int pointerId){
+
+    private void touchStarted(float x, float y, int pointerId) {
         Path path; // Store the path for given touch
         Point point; // Store the last point in path
 
-        if (pathMap.containsKey(pointerId)){
+        if (pathMap.containsKey(pointerId)) {
             path = pathMap.get(pointerId);
             point = previousPointMap.get(pointerId);
-        }else {
+        } else {
             path = new Path();
             pathMap.put(pointerId, path);
             point = new Point();
@@ -189,36 +196,36 @@ public class ArtView extends View {
         point.y = (int) y;
     }
 
-   @SuppressLint("WrongThread")
-   public void saveImage() {
-       ContextWrapper cw = new ContextWrapper(getContext());
-       String filename = "TempART" + System.currentTimeMillis();
-       // path to /data/data/yourapp/app_data/imageDir
-       File directory = cw.getDir("files", Context.MODE_PRIVATE);
-       path = cw.getDir("files", Context.MODE_PRIVATE).toString();
-       // create imageDir
-       File myPath = new File(directory, filename + ".jpg");
+    @SuppressLint("WrongThread")
+    public void saveImage() {
+        ContextWrapper cw = new ContextWrapper(getContext());
+        String filename = "TempART" + System.currentTimeMillis();
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("files", Context.MODE_PRIVATE);
+        path = cw.getDir("files", Context.MODE_PRIVATE).toString();
+        // create imageDir
+        File myPath = new File(directory, filename + ".jpg");
 
-       FileOutputStream fileOutputStream = null;
-       try {
-           fileOutputStream = new FileOutputStream(myPath);
-           //Use the compress method on the BitMap object to write image to the OutputStream
-           bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-       }catch(Exception e){
-           e.printStackTrace();
-       }finally {
-           try {
-               fileOutputStream.flush();
-               fileOutputStream.close();
-               Log.d("Image:", directory.getAbsolutePath());
-               Toast message = Toast.makeText(getContext(),"Image Saved +" + directory.getAbsolutePath(), Toast.LENGTH_LONG);
-               message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2 , message.getYOffset() / 2);
-               message.show();
-           }catch (IOException e){
-               e.printStackTrace();
-           }
-       }
-   }
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(myPath);
+            //Use the compress method on the BitMap object to write image to the OutputStream
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileOutputStream.flush();
+                fileOutputStream.close();
+                Log.d("Image:", directory.getAbsolutePath());
+                Toast message = Toast.makeText(getContext(), "Image Saved +" + directory.getAbsolutePath(), Toast.LENGTH_LONG);
+                message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
+                message.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }

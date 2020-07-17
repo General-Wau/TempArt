@@ -27,6 +27,12 @@ public class GalleryActivity extends AppCompatActivity {
     String path;
 
     @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        showImages();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
