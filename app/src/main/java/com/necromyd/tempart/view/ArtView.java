@@ -1,36 +1,25 @@
 package com.necromyd.tempart.view;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
-
-import com.necromyd.tempart.R;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 
 public class ArtView extends View {
@@ -46,7 +35,6 @@ public class ArtView extends View {
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
 
@@ -54,13 +42,18 @@ public class ArtView extends View {
         return pathMap;
     }
 
-    public void setBitmapCanvas(Bitmap bmap) {
-        bitmap = bmap;
-    }
+    public void init(DisplayMetrics metrics , Bitmap bitmap) {
+        int height = metrics.heightPixels;
+        int width = metrics.widthPixels;
+        if(bitmap == null){
+            this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmapCanvas = new Canvas(this.bitmap);
+        }else{
+            this.bitmap = Bitmap.createBitmap(bitmap);
+            bitmapCanvas = new Canvas(this.bitmap);
+        }
 
-    void init() {
         paintScreen = new Paint();
-
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
         paintLine.setStyle(Paint.Style.STROKE);
@@ -75,18 +68,12 @@ public class ArtView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.save();
         canvas.drawBitmap(bitmap, 0, 0, paintScreen);
         for (Integer key : pathMap.keySet()) {
             canvas.drawPath(pathMap.get(key), paintLine);
         }
-    }
-
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        bitmapCanvas = new Canvas(bitmap);
-        bitmap.eraseColor(Color.WHITE);
+        canvas.restore();
     }
 
     @Override

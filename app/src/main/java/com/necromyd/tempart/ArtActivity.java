@@ -5,12 +5,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,14 +46,22 @@ public class ArtActivity extends AppCompatActivity {
 
         artView = findViewById(R.id.artView);
         imageSaved = false;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
             if (extras.getString("image") != null) {
                 String path = extras.getString("image");
                 Bitmap myBitmap = BitmapFactory.decodeFile(path);
-                artView.setBitmapCanvas(myBitmap);
+                myBitmap = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                artView.init(metrics , myBitmap);
             }
+        }else{
+            artView.init(metrics , null);
         }
     }
 
@@ -107,7 +117,7 @@ public class ArtActivity extends AppCompatActivity {
         dialogLineWidth.show();
     }
 
-    void showColorDialog(){
+    void showColorDialog() {
         currentAlertDialog = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
         alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
@@ -133,8 +143,8 @@ public class ArtActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 artView.setDrawingColor(Color.argb(
-                        alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(),blueSeekBar.getProgress()
+                        alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+                        greenSeekBar.getProgress(), blueSeekBar.getProgress()
                 ));
 
                 colorDialog.dismiss();
@@ -147,18 +157,18 @@ public class ArtActivity extends AppCompatActivity {
         colorDialog.show();
     }
 
-    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener(){
+    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             artView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
+                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
             ));
 
             //display the current color
             colorView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
+                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
             ));
         }
 
@@ -174,7 +184,7 @@ public class ArtActivity extends AppCompatActivity {
     };
 
     private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
-        Bitmap bitmap = Bitmap.createBitmap(300,100, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
         @Override
@@ -186,7 +196,7 @@ public class ArtActivity extends AppCompatActivity {
             p.setStrokeWidth(progress);
 
             bitmap.eraseColor(Color.WHITE);
-            canvas.drawLine(10,50, 287,50, p);
+            canvas.drawLine(10, 50, 287, 50, p);
             widthImageView.setImageBitmap(bitmap);
         }
 
@@ -203,11 +213,11 @@ public class ArtActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(artView.getPathMap().isEmpty()){
+        if (artView.getPathMap().isEmpty()) {
 //            Intent c = new Intent(getApplicationContext(), MainActivity.class);
 //            startActivity(c);
             super.onBackPressed();
-        }else{
+        } else {
             currentAlertDialog = new AlertDialog.Builder(this);
             currentAlertDialog.setCancelable(false);
             View view = getLayoutInflater().inflate(R.layout.back_button_dialog, null);
@@ -240,39 +250,23 @@ public class ArtActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-        if(!artView.getPathMap().isEmpty()){
-            if(!imageSaved){
-                artView.saveImage();
-                imageSaved = true;
-            }
-        }
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-        if(!artView.getPathMap().isEmpty()){
-            if(!imageSaved){
-                artView.saveImage();
-                imageSaved = true;
-            }
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public boolean isFinishing() {
         Log.d(TAG, "onDestroy");
-        if(!artView.getPathMap().isEmpty()){
-            if(!imageSaved){
+        if (!artView.getPathMap().isEmpty()) {
+            if (!imageSaved) {
                 artView.saveImage();
                 imageSaved = true;
             }
         }
+        return super.isFinishing();
     }
+
+
 }
