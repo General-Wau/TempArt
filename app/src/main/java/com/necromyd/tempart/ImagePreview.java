@@ -1,6 +1,7 @@
 package com.necromyd.tempart;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ public class ImagePreview extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_preview);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         btn1 = (Button) findViewById(R.id.btn_showImageEdit);
         btn2 = (Button) findViewById(R.id.btn_showImageDelete);
         imageView = (ImageView) findViewById(R.id.showImageId);

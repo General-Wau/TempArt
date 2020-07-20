@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,6 +44,7 @@ public class ArtActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         artView = findViewById(R.id.artView);
         imageSaved = false;
@@ -254,6 +256,18 @@ public class ArtActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onDestroy");
+        if (!artView.getPathMap().isEmpty()) {
+            if (!imageSaved) {
+                artView.saveImage();
+                imageSaved = true;
+            }
+        }
+        super.onStop();
     }
 
     @Override
