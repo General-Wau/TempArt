@@ -162,7 +162,7 @@ public class ArtActivity extends AppCompatActivity {
     private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            artView.setBackgroundColor(Color.argb(
+            artView.setDrawingColor(Color.argb(
                     alphaSeekBar.getProgress(), redSeekBar.getProgress(),
                     greenSeekBar.getProgress(), blueSeekBar.getProgress()
             ));
