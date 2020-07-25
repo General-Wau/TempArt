@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.necromyd.tempart.view.ArtView;
 
 public class ArtActivity extends AppCompatActivity {
@@ -52,6 +54,10 @@ public class ArtActivity extends AppCompatActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+        FloatingActionButton fab = findViewById(R.id.fabButton);
+        BottomAppBar bottomAppBar = findViewById(R.id.bottomAppBar);
+        setSupportActionBar(bottomAppBar);
+
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -60,10 +66,10 @@ public class ArtActivity extends AppCompatActivity {
                 String path = extras.getString("image");
                 Bitmap myBitmap = BitmapFactory.decodeFile(path);
                 myBitmap = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
-                artView.init(metrics , myBitmap);
+                artView.init(metrics, myBitmap);
             }
-        }else{
-            artView.init(metrics , null);
+        } else {
+            artView.init(metrics, null);
         }
     }
 
@@ -83,6 +89,7 @@ public class ArtActivity extends AppCompatActivity {
                 break;
             case R.id.saveid:
                 artView.saveImage();
+                imageSaved = true;
                 break;
             case R.id.colorid:
                 showColorDialog();
@@ -162,6 +169,7 @@ public class ArtActivity extends AppCompatActivity {
     private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            // tip , future feature could use artView.setBackgroundColor to change the canvas color
             artView.setDrawingColor(Color.argb(
                     alphaSeekBar.getProgress(), redSeekBar.getProgress(),
                     greenSeekBar.getProgress(), blueSeekBar.getProgress()
@@ -215,11 +223,14 @@ public class ArtActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (artView.getPathMap().isEmpty()) {
-//            Intent c = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(c);
+        if (imageSaved) {
             super.onBackPressed();
-        } else {
+        }
+//        if (artView.getPathMap().isEmpty()) {
+////            Intent c = new Intent(getApplicationContext(), MainActivity.class);
+////            startActivity(c);
+//            super.onBackPressed();}
+        else {
             currentAlertDialog = new AlertDialog.Builder(this);
             currentAlertDialog.setCancelable(false);
             View view = getLayoutInflater().inflate(R.layout.back_button_dialog, null);

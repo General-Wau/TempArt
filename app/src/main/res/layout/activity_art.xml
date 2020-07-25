@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.necromyd.tempart.view.ArtView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/artView"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ArtActivity">
-</com.necromyd.tempart.view.ArtView>
+
+    <com.necromyd.tempart.view.ArtView
+        android:id="@+id/artView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:backgroundTint="@color/colorPrimary"
+        app:fabAlignmentMode="end"
+        app:hideOnScroll="false"
+        app:fabCradleMargin="10dp"
+        app:fabCradleVerticalOffset="0dp"
+        app:fabCradleRoundedCornerRadius="30dp"
+        app:menu="@menu/menu"
+        app:navigationIcon="@drawable/ic_menu" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_save"
+        app:backgroundTint="@color/colorAccent"
+        app:maxImageSize="35dp"
+        app:tint="@color/colorWhite"
+        app:layout_anchor="@id/bottomAppBar"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
