@@ -1,3 +1,3 @@
 # TempArt
 
-Private Project
+Drawing application for android . Work in progress .
