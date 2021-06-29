@@ -12,11 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.ContactsContract;
 import android.widget.Toast;
-
-import com.necromyd.tempart.view.ArtView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -101,11 +97,12 @@ public class GalleryActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1000){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //show images
                 showImages();
-            }else {
+            } else {
                 Toast.makeText(this, "Permission not granted!", Toast.LENGTH_SHORT).show();
                 finish();
             }

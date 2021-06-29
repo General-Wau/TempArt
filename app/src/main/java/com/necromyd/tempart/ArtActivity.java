@@ -25,7 +25,6 @@ import android.widget.SeekBar;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.necromyd.tempart.view.ArtView;
 
 public class ArtActivity extends AppCompatActivity {
 

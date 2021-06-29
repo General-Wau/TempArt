@@ -1,4 +1,4 @@
-package com.necromyd.tempart.view;
+package com.necromyd.tempart;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ArtView extends View {
 
@@ -47,11 +48,10 @@ public class ArtView extends View {
         int width = metrics.widthPixels;
         if(bitmap == null){
             this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmapCanvas = new Canvas(this.bitmap);
         }else{
             this.bitmap = Bitmap.createBitmap(bitmap);
-            bitmapCanvas = new Canvas(this.bitmap);
         }
+        bitmapCanvas = new Canvas(this.bitmap);
 
         paintScreen = new Paint();
         paintLine = new Paint();
@@ -71,7 +71,7 @@ public class ArtView extends View {
         canvas.save();
         canvas.drawBitmap(bitmap, 0, 0, paintScreen);
         for (Integer key : pathMap.keySet()) {
-            canvas.drawPath(pathMap.get(key), paintLine);
+            canvas.drawPath(Objects.requireNonNull(pathMap.get(key)), paintLine);
         }
         canvas.restore();
     }
@@ -86,7 +86,7 @@ public class ArtView extends View {
             touchStarted(event.getX(actionIndex),
                     event.getY(actionIndex),
                     event.getPointerId(actionIndex));
-        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+        } else if (action == MotionEvent.ACTION_UP) {
             touchEnded(event.getPointerId(actionIndex));
         } else {
             touchMoved(event);
@@ -112,6 +112,7 @@ public class ArtView extends View {
 
                 //Calculate how far the user moved from the last update
 
+                assert point != null;
                 float deltaX = Math.abs(newX - point.x);
                 float deltaY = Math.abs(newY - point.y);
 
@@ -121,6 +122,7 @@ public class ArtView extends View {
                     if (event.getX() < 0 | event.getX() > bitmapCanvas.getWidth()) {
                         break;
                     }
+                    assert path != null;
                     path.quadTo(point.x, point.y,
                             (newX + point.x) / 2,
                             (newY + point.y) / 2);
@@ -159,6 +161,7 @@ public class ArtView extends View {
 
     private void touchEnded(int pointerId) {
         Path path = pathMap.get(pointerId); // get corresponding path
+        assert path != null;
         bitmapCanvas.drawPath(path, paintLine); // draw to bitmapCanvas
         path.reset();
     }
@@ -178,7 +181,9 @@ public class ArtView extends View {
         }
 
         //move to the coordinates of the touch
+        assert path != null;
         path.moveTo(x, y);
+        assert point != null;
         point.x = (int) x;
         point.y = (int) y;
     }
@@ -202,6 +207,7 @@ public class ArtView extends View {
             e.printStackTrace();
         } finally {
             try {
+                assert fileOutputStream != null;
                 fileOutputStream.flush();
                 fileOutputStream.close();
                 Log.d("Image:", directory.getAbsolutePath());

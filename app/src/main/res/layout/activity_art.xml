@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ArtActivity">
 
-    <com.necromyd.tempart.view.ArtView
+    <com.necromyd.tempart.ArtView
         android:id="@+id/artView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

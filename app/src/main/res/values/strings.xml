@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TempArt</string>
+    <string name="app_name">Temp Art</string>
     <string name="Color">color</string>
     <string name="save">save</string>
     <string name="lineWidth">Line Width</string>
