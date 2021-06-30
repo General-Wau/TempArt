@@ -45,7 +45,6 @@ public class ImagePreview extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.btn_showImageEdit:
                 Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("image", name);
                 startActivity(intent);
                 finish();
@@ -56,8 +55,6 @@ public class ImagePreview extends AppCompatActivity implements View.OnClickListe
                 if (file.exists()) {
                     file.delete();
                     finish();
-//                    Intent a = new Intent(getApplicationContext(), GalleryActivity.class);
-//                    startActivity(a);
                 }
                 break;
         }
