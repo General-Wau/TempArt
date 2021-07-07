@@ -3,6 +3,7 @@ package com.necromyd.tempart;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -52,10 +53,9 @@ public class ArtActivity extends AppCompatActivity {
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        FloatingActionButton fab = findViewById(R.id.fabButton);
         BottomAppBar bottomAppBar = findViewById(R.id.bottomAppBar);
         setSupportActionBar(bottomAppBar);
+
 
 
         Intent intent = getIntent();
