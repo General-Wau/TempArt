@@ -17,5 +17,6 @@
     <string name="Redo">Redo</string>
     <string name="colorize">Colorize</string>
     <string name="floating_save_button">Floating Save Button</string>
+    <string name="show_menu">Show menu</string>
 
 </resources>

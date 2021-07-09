@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
@@ -40,6 +41,7 @@ public class ArtActivity extends AppCompatActivity {
     private SeekBar blueSeekBar;
     private View colorView;
     private boolean imageSaved;
+    private boolean visible = true;
     private static final String TAG = "ArtActivity";
 
     @Override
@@ -53,8 +55,20 @@ public class ArtActivity extends AppCompatActivity {
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        BottomAppBar bottomAppBar = findViewById(R.id.bottomAppBar);
-        setSupportActionBar(bottomAppBar);
+        LinearLayout tools = (LinearLayout) findViewById(R.id.Layout_Tools);
+        LinearLayout utils = (LinearLayout) findViewById(R.id.Layout_Util);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            if(visible){
+                tools.setVisibility(View.INVISIBLE);
+                utils.setVisibility(View.INVISIBLE);
+                visible = false;
+            }else{
+                tools.setVisibility(View.VISIBLE);
+                utils.setVisibility(View.VISIBLE);
+                visible = true;
+            }
+        });
 
 
 
@@ -79,146 +93,146 @@ public class ArtActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//
+//        switch (item.getItemId()) {
+//            case R.id.clearid:
+//                artView.clear();
+//                break;
+//            case R.id.saveid:
+//                artView.saveImage();
+//                imageSaved = true;
+//                break;
+//            case R.id.colorid:
+//                showColorDialog();
+//                break;
+//            case R.id.lineWidth:
+//                showLineWidthDialog();
+//                break;
+//            case R.id.eraseid:
+//                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
-        switch (item.getItemId()) {
-            case R.id.clearid:
-                artView.clear();
-                break;
-            case R.id.saveid:
-                artView.saveImage();
-                imageSaved = true;
-                break;
-            case R.id.colorid:
-                showColorDialog();
-                break;
-            case R.id.lineWidth:
-                showLineWidthDialog();
-                break;
-            case R.id.eraseid:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    void showLineWidthDialog() {
+//        currentAlertDialog = new AlertDialog.Builder(this);
+//        View view = getLayoutInflater().inflate(R.layout.width_dialog, null);
+//        final SeekBar widthSeekbar = view.findViewById(R.id.seekBarId);
+//        widthSeekbar.setProgress(artView.getLineWidth());
+//        Button setLineWidthButton = view.findViewById(R.id.buttonDialogId);
+//        widthImageView = view.findViewById(R.id.imageViewId);
+//        setLineWidthButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                artView.setLineWidth(widthSeekbar.getProgress());
+//                dialogLineWidth.dismiss();
+//                currentAlertDialog = null;
+//            }
+//        });
+//
+//        widthSeekbar.setOnSeekBarChangeListener(widthSeekBarChange);
+//        currentAlertDialog.setView(view);
+//        dialogLineWidth = currentAlertDialog.create();
+//        dialogLineWidth.setTitle("Set Line Width");
+//        dialogLineWidth.show();
+//    }
 
-    void showLineWidthDialog() {
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.width_dialog, null);
-        final SeekBar widthSeekbar = view.findViewById(R.id.seekBarId);
-        widthSeekbar.setProgress(artView.getLineWidth());
-        Button setLineWidthButton = view.findViewById(R.id.buttonDialogId);
-        widthImageView = view.findViewById(R.id.imageViewId);
-        setLineWidthButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setLineWidth(widthSeekbar.getProgress());
-                dialogLineWidth.dismiss();
-                currentAlertDialog = null;
-            }
-        });
+//    void showColorDialog() {
+//        currentAlertDialog = new AlertDialog.Builder(this);
+//        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
+//        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
+//        redSeekBar = view.findViewById(R.id.redSeekBar);
+//        greenSeekBar = view.findViewById(R.id.greenSeekBar);
+//        blueSeekBar = view.findViewById(R.id.blueSeekBar);
+//        colorView = view.findViewById(R.id.colorView);
+//
+//        //register SeekBar event Listeners
+//        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+//        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+//        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+//        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+//
+//        int color = artView.getDrawingColor();
+//        alphaSeekBar.setProgress(Color.alpha(color));
+//        redSeekBar.setProgress(Color.red(color));
+//        greenSeekBar.setProgress(Color.green(color));
+//        blueSeekBar.setProgress(Color.blue(color));
+//
+//        Button setColorButton = view.findViewById(R.id.setColorButton);
+//        setColorButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                artView.setDrawingColor(Color.argb(
+//                        alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+//                        greenSeekBar.getProgress(), blueSeekBar.getProgress()
+//                ));
+//
+//                colorDialog.dismiss();
+//            }
+//        });
+//
+//        currentAlertDialog.setView(view);
+//        currentAlertDialog.setTitle("Choose Color");
+//        colorDialog = currentAlertDialog.create();
+//        colorDialog.show();
+//    }
 
-        widthSeekbar.setOnSeekBarChangeListener(widthSeekBarChange);
-        currentAlertDialog.setView(view);
-        dialogLineWidth = currentAlertDialog.create();
-        dialogLineWidth.setTitle("Set Line Width");
-        dialogLineWidth.show();
-    }
-
-    void showColorDialog() {
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
-        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
-        redSeekBar = view.findViewById(R.id.redSeekBar);
-        greenSeekBar = view.findViewById(R.id.greenSeekBar);
-        blueSeekBar = view.findViewById(R.id.blueSeekBar);
-        colorView = view.findViewById(R.id.colorView);
-
-        //register SeekBar event Listeners
-        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-
-        int color = artView.getDrawingColor();
-        alphaSeekBar.setProgress(Color.alpha(color));
-        redSeekBar.setProgress(Color.red(color));
-        greenSeekBar.setProgress(Color.green(color));
-        blueSeekBar.setProgress(Color.blue(color));
-
-        Button setColorButton = view.findViewById(R.id.setColorButton);
-        setColorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setDrawingColor(Color.argb(
-                        alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(), blueSeekBar.getProgress()
-                ));
-
-                colorDialog.dismiss();
-            }
-        });
-
-        currentAlertDialog.setView(view);
-        currentAlertDialog.setTitle("Choose Color");
-        colorDialog = currentAlertDialog.create();
-        colorDialog.show();
-    }
-
-    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            // tip , future feature could use artView.setBackgroundColor to change the canvas color
-            artView.setDrawingColor(Color.argb(
-                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
-            ));
-
-            //display the current color
-            colorView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
-            ));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
-        Bitmap bitmap = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            Paint p = new Paint();
-            p.setColor(artView.getDrawingColor());
-            p.setStrokeCap(Paint.Cap.ROUND);
-            p.setStrokeWidth(progress);
-
-            bitmap.eraseColor(Color.WHITE);
-            canvas.drawLine(10, 50, 287, 50, p);
-            widthImageView.setImageBitmap(bitmap);
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
+//    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
+//        @Override
+//        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//            // tip , future feature could use artView.setBackgroundColor to change the canvas color
+//            artView.setDrawingColor(Color.argb(
+//                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+//                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
+//            ));
+//
+//            //display the current color
+//            colorView.setBackgroundColor(Color.argb(
+//                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+//                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
+//            ));
+//        }
+//
+//        @Override
+//        public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//
+//        @Override
+//        public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//    };
+//
+//    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
+//        Bitmap bitmap = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap);
+//
+//        @Override
+//        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//
+//            Paint p = new Paint();
+//            p.setColor(artView.getDrawingColor());
+//            p.setStrokeCap(Paint.Cap.ROUND);
+//            p.setStrokeWidth(progress);
+//
+//            bitmap.eraseColor(Color.WHITE);
+//            canvas.drawLine(10, 50, 287, 50, p);
+//            widthImageView.setImageBitmap(bitmap);
+//        }
+//
+//        @Override
+//        public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//
+//        @Override
+//        public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//    };
 
     @Override
     public void onBackPressed() {

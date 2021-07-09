@@ -14,26 +14,115 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinatorLayout"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_baseline_arrow_left"
+        android:layout_marginBottom="16dp"
+        app:maxImageSize="50dp"
+        android:contentDescription="@string/show_menu"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hideOnScroll="false"
-            android:alpha="0.5"
-            app:menu="@menu/menu" />
+    <LinearLayout
+        android:id="@+id/Layout_Tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
+        app:layout_constraintEnd_toEndOf="@+id/fab"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/fab"
+        android:background="@color/whiteAlpha"
+        >
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <ImageView
+            android:id="@+id/btn_brush"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            app:srcCompat="@drawable/ic_baseline_brush" />
+
+        <ImageView
+            android:id="@+id/btn_palette"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            app:srcCompat="@drawable/ic_baseline_palette" />
+
+        <ImageView
+            android:id="@+id/btn_picker"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            app:srcCompat="@drawable/ic_baseline_colorize" />
+
+        <ImageView
+            android:id="@+id/btn_eraser"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            app:srcCompat="@drawable/ic_baseline_erase" />
+
+        <ImageView
+            android:id="@+id/btn_redo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            app:srcCompat="@drawable/ic_baseline_redo" />
+
+        <ImageView
+            android:id="@+id/btn_undo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/ic_baseline_undo" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Layout_Util"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/fab"
+        app:layout_constraintEnd_toStartOf="@+id/fab"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/fab"
+        app:layout_constraintVertical_bias="0.448"
+        android:background="@color/whiteAlpha">
+
+        <ImageView
+            android:id="@+id/btn_clear"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            app:srcCompat="@drawable/ic_baseline_new_page" />
+
+        <ImageView
+            android:id="@+id/btn_save"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            app:srcCompat="@drawable/ic_baseline_save" />
+
+        <ImageView
+            android:id="@+id/btn_layers"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_baseline_layers" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
