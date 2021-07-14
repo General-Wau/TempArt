@@ -5,8 +5,8 @@
     <string name="lineWidth">Line Width</string>
     <string name="erase">Erase</string>
     <string name="clear">Clear</string>
-    <string name="set_width">Set Width</string>
-    <string name="todo">TODO</string>
+    <string name="set_width">Set</string>
+    <string name="todo">Line Preview</string>
     <string name="label_alpha">Alpha</string>
     <string name="label_red">Red</string>
     <string name="label_green">Green</string>
@@ -18,5 +18,6 @@
     <string name="colorize">Colorize</string>
     <string name="floating_save_button">Floating Save Button</string>
     <string name="show_menu">Show menu</string>
+    <string name="width">Width</string>
 
 </resources>

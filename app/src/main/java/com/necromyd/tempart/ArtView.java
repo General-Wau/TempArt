@@ -146,8 +146,9 @@ public class ArtView extends View {
         return paintLine.getColor();
     }
 
-    public void setLineWidth(int width) {
+    public void setLineWidth(int width, int alpha) {
         paintLine.setStrokeWidth(width);
+        paintLine.setAlpha(alpha);
     }
 
     public int getLineWidth() {
