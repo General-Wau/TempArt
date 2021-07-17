@@ -108,6 +108,9 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_brush) showLineWidthDialog();
+        else if (v.getId() == R.id.btn_undo){
+            artView.undo();
+        }
     }
 
 //    @Override
@@ -309,7 +312,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         Log.d(TAG, "onDestroy");
-        if (!artView.getPathMap().isEmpty()) {
+        if (!artView.getPath().isEmpty()) {
             if (!imageSaved) {
                 artView.saveImage();
                 imageSaved = true;
@@ -321,7 +324,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public boolean isFinishing() {
         Log.d(TAG, "onDestroy");
-        if (!artView.getPathMap().isEmpty()) {
+        if (!artView.getPath().isEmpty()) {
             if (!imageSaved) {
                 artView.saveImage();
                 imageSaved = true;

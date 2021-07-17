@@ -17,32 +17,34 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
 public class ArtView extends View {
 
-    public static final float TOUCH_TOLERANCE = 10;
+    public static final float TOUCH_TOLERANCE = 5;
     private Bitmap bitmap;
-    private Canvas bitmapCanvas;
-    private Paint paintScreen;
+    private Path mPath;
+    private float mX, mY;
     private Paint paintLine;
-    private HashMap<Integer, Path> pathMap;
-    private HashMap<Integer, Point> previousPointMap;
-    public static String path;
+    private ArrayList<Brush> path;
+    private ArrayList<Brush> undo;
+    public static String pathString;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
 
-    public HashMap<Integer, Path> getPathMap() {
-        return pathMap;
+    public ArrayList<Brush> getPath() {
+        return path;
     }
 
     public void init(DisplayMetrics metrics , Bitmap bitmap) {
@@ -53,89 +55,93 @@ public class ArtView extends View {
         }else{
             this.bitmap = Bitmap.createBitmap(bitmap);
         }
-        bitmapCanvas = new Canvas(this.bitmap);
 
-        paintScreen = new Paint();
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
+        paintLine.setDither(true);
+        paintLine.setStrokeJoin(Paint.Join.ROUND);
         paintLine.setStyle(Paint.Style.STROKE);
         paintLine.setColor(Color.BLACK);
         paintLine.setStrokeWidth(1);
         paintLine.setStrokeCap(Paint.Cap.ROUND);
+        paintLine.setXfermode(null);
+        paintLine.setAlpha(0xff);
 
-        pathMap = new HashMap<>();
-        previousPointMap = new HashMap<>();
+        path = new ArrayList<>();
+        undo = new ArrayList<>();
+
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-        canvas.drawBitmap(bitmap, 0, 0, paintScreen);
-        for (Integer key : pathMap.keySet()) {
-            canvas.drawPath(Objects.requireNonNull(pathMap.get(key)), paintLine);
+
+        for (Brush brush : path){
+            paintLine.setColor(brush.color);
+            paintLine.setStrokeWidth(brush.strokeWidth);
+            paintLine.setMaskFilter(null);
+            canvas.drawPath(brush.path,paintLine);
         }
+        canvas.drawBitmap(bitmap, 0, 0, paintLine);
         canvas.restore();
+    }
+
+    public void undo(){
+        if (undo.size() > 0){
+
+        }else{
+            Snackbar.make(this, "Nothing to undo !", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
 
-        int action = event.getActionMasked(); // event type
-        int actionIndex = event.getActionIndex(); // pointer (finger , mouse)
-
-        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_UP) {
-            touchStarted(event.getX(actionIndex),
-                    event.getY(actionIndex),
-                    event.getPointerId(actionIndex));
-        } else if (action == MotionEvent.ACTION_UP) {
-            touchEnded(event.getPointerId(actionIndex));
-        } else {
-            touchMoved(event);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                touchStart(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                touchUp();
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                touchMove(x, y);
+                invalidate();
+                break;
         }
-
-        invalidate(); // redraw the screen
         return true;
     }
 
-    private void touchMoved(MotionEvent event) {
-
-        for (int i = 0; i < event.getPointerCount(); i++) {
-
-            int pointerId = event.getPointerId(i);
-            int pointerIndex = event.findPointerIndex(pointerId);
-
-            if (pathMap.containsKey(pointerId)) {
-                float newX = event.getX(pointerIndex);
-                float newY = event.getY(pointerIndex);
-
-                Path path = pathMap.get(pointerId);
-                Point point = previousPointMap.get(pointerId);
-
-                //Calculate how far the user moved from the last update
-
-                assert point != null;
-                float deltaX = Math.abs(newX - point.x);
-                float deltaY = Math.abs(newY - point.y);
-
-                //if the distance is significant enough to be considered movement
-                if (deltaX >= TOUCH_TOLERANCE || deltaY >= TOUCH_TOLERANCE) {
-                    // move the path to the new location
-                    if (event.getX() < 0 | event.getX() > bitmapCanvas.getWidth()) {
-                        break;
-                    }
-                    assert path != null;
-                    path.quadTo(point.x, point.y,
-                            (newX + point.x) / 2,
-                            (newY + point.y) / 2);
-
-                    //store the new coordinates
-                    point.x = (int) newX;
-                    point.y = (int) newY;
-                }
-            }
-        }
+    private void touchUp () {
+        mPath.lineTo(mX, mY);
     }
+
+    private void touchMove (float x, float y) {
+        float dx = Math.abs(x - mX);
+        float dy = Math.abs(y - mY);
+
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
+        }
+
+    }    private void touchStart (float x, float y) {
+        mPath = new Path();
+        Brush draw = new Brush(paintLine.getColor(), (int)paintLine.getStrokeWidth(), mPath);
+        path.add(draw);
+        mPath.reset();
+        mPath.moveTo(x, y);
+        mX = x;
+        mY = y;
+    }
+
+
 
 
     public void setDrawingColor(int color) {
@@ -155,41 +161,16 @@ public class ArtView extends View {
         return (int) paintLine.getStrokeWidth();
     }
 
-    public void clear() {
-        pathMap.clear(); // removes all of the paths
-        previousPointMap.clear();
-        bitmap.eraseColor(Color.WHITE);
-        invalidate(); // refresh the screen
-    }
+//    public void clear() {
+//        pathMap.clear(); // removes all of the paths
+//        previousPointMap.clear();
+//        bitmap.eraseColor(Color.WHITE);
+//        invalidate(); // refresh the screen
+//    }
 
-    private void touchEnded(int pointerId) {
-        Path path = pathMap.get(pointerId); // get corresponding path
-        assert path != null;
-        bitmapCanvas.drawPath(path, paintLine); // draw to bitmapCanvas
-        path.reset();
-    }
 
-    private void touchStarted(float x, float y, int pointerId) {
-        Path path; // Store the path for given touch
-        Point point; // Store the last point in path
 
-        if (pathMap.containsKey(pointerId)) {
-            path = pathMap.get(pointerId);
-            point = previousPointMap.get(pointerId);
-        } else {
-            path = new Path();
-            pathMap.put(pointerId, path);
-            point = new Point();
-            previousPointMap.put(pointerId, point);
-        }
 
-        //move to the coordinates of the touch
-        assert path != null;
-        path.moveTo(x, y);
-        assert point != null;
-        point.x = (int) x;
-        point.y = (int) y;
-    }
 
     @SuppressLint("WrongThread")
     public void saveImage() {
@@ -197,7 +178,7 @@ public class ArtView extends View {
         String filename = "TempART" + System.currentTimeMillis();
         // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("files", Context.MODE_PRIVATE);
-        path = cw.getDir("files", Context.MODE_PRIVATE).toString();
+        pathString = cw.getDir("files", Context.MODE_PRIVATE).toString();
         // create imageDir
         File myPath = new File(directory, filename + ".jpg");
 
