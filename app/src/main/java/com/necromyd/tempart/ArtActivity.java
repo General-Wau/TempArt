@@ -115,30 +115,6 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//
-//        switch (item.getItemId()) {
-//            case R.id.clearid:
-//                artView.clear();
-//                break;
-//            case R.id.saveid:
-//                artView.saveImage();
-//                imageSaved = true;
-//                break;
-//            case R.id.colorid:
-//                showColorDialog();
-//                break;
-//            case R.id.lineWidth:
-//                showLineWidthDialog();
-//                break;
-//            case R.id.eraseid:
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-
     void showLineWidthDialog() {
         currentAlertDialog = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.width_dialog, null);

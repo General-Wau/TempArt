@@ -85,6 +85,7 @@ public class ArtView extends View {
             canvas.drawPath(brush.path, paintLine);
         }
         canvas.drawBitmap(bitmap, 0, 0, paintLine);
+
         canvas.restore();
     }
 
@@ -194,6 +195,11 @@ public class ArtView extends View {
         try {
             fileOutputStream = new FileOutputStream(myPath);
             //Use the compress method on the BitMap object to write image to the OutputStream
+
+            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            draw(canvas);
+
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
         } catch (Exception e) {
             e.printStackTrace();
