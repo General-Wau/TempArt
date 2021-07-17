@@ -88,8 +88,9 @@ public class ArtView extends View {
     }
 
     public void undo(){
-        if (undo.size() > 0){
-
+        if (path.size() > 0){
+            undo.add(path.remove(path.size() -1));
+            invalidate();
         }else{
             Snackbar.make(this, "Nothing to undo !", Snackbar.LENGTH_SHORT).show();
         }
