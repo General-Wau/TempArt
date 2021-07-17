@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -47,12 +48,12 @@ public class ArtView extends View {
         return path;
     }
 
-    public void init(DisplayMetrics metrics , Bitmap bitmap) {
+    public void init(DisplayMetrics metrics, Bitmap bitmap) {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
-        if(bitmap == null){
+        if (bitmap == null) {
             this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        }else{
+        } else {
             this.bitmap = Bitmap.createBitmap(bitmap);
         }
 
@@ -77,22 +78,31 @@ public class ArtView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.save();
 
-        for (Brush brush : path){
+        for (Brush brush : path) {
             paintLine.setColor(brush.color);
             paintLine.setStrokeWidth(brush.strokeWidth);
             paintLine.setMaskFilter(null);
-            canvas.drawPath(brush.path,paintLine);
+            canvas.drawPath(brush.path, paintLine);
         }
         canvas.drawBitmap(bitmap, 0, 0, paintLine);
         canvas.restore();
     }
 
-    public void undo(){
-        if (path.size() > 0){
-            undo.add(path.remove(path.size() -1));
+    public void undo() {
+        if (path.size() > 0) {
+            undo.add(path.remove(path.size() - 1));
             invalidate();
-        }else{
+        } else {
             Snackbar.make(this, "Nothing to undo !", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    public void redo() {
+        if (undo.size() > 0) {
+            path.add(undo.remove(undo.size() - 1));
+            invalidate();
+        } else {
+            Snackbar.make(this, "Nothing to redo !", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -118,11 +128,11 @@ public class ArtView extends View {
         return true;
     }
 
-    private void touchUp () {
+    private void touchUp() {
         mPath.lineTo(mX, mY);
     }
 
-    private void touchMove (float x, float y) {
+    private void touchMove(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
 
@@ -132,17 +142,17 @@ public class ArtView extends View {
             mY = y;
         }
 
-    }    private void touchStart (float x, float y) {
+    }
+
+    private void touchStart(float x, float y) {
         mPath = new Path();
-        Brush draw = new Brush(paintLine.getColor(), (int)paintLine.getStrokeWidth(), mPath);
+        Brush draw = new Brush(paintLine.getColor(), (int) paintLine.getStrokeWidth(), mPath);
         path.add(draw);
         mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
     }
-
-
 
 
     public void setDrawingColor(int color) {
@@ -168,9 +178,6 @@ public class ArtView extends View {
 //        bitmap.eraseColor(Color.WHITE);
 //        invalidate(); // refresh the screen
 //    }
-
-
-
 
 
     @SuppressLint("WrongThread")

@@ -110,6 +110,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         if (v.getId() == R.id.btn_brush) showLineWidthDialog();
         else if (v.getId() == R.id.btn_undo){
             artView.undo();
+        }else if (v.getId() == R.id.btn_redo){
+            artView.redo();
         }
     }
 
