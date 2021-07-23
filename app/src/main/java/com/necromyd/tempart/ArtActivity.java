@@ -105,6 +105,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+
+//Handle tool buttons
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_brush) showLineWidthDialog();
@@ -238,7 +240,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     };
 
-
+//Save image before exit
     @Override
     public void onBackPressed() {
         if (imageSaved) {
