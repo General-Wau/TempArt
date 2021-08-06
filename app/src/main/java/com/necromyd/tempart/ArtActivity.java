@@ -106,17 +106,18 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     }
 
 
-//Handle tool buttons
+    //Handle tool buttons
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_brush) showLineWidthDialog();
-        else if (v.getId() == R.id.btn_undo){
+        else if (v.getId() == R.id.btn_undo) {
             artView.undo();
-        }else if (v.getId() == R.id.btn_redo){
+        } else if (v.getId() == R.id.btn_redo) {
             artView.redo();
         }
     }
 
+    // Line width and transparency dialog
     void showLineWidthDialog() {
         currentAlertDialog = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.width_dialog, null);
@@ -211,6 +212,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
 //        }
 //    };
 //
+
+    // Line width seekbar listener
     private final SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
         final Bitmap bitmap = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
@@ -240,7 +243,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     };
 
-//Save image before exit
+    //Save image before exit
     @Override
     public void onBackPressed() {
         if (imageSaved) {
@@ -289,6 +292,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         super.onConfigurationChanged(newConfig);
     }
 
+    // Check if image is saved, save if not
     @Override
     protected void onStop() {
         Log.d(TAG, "onDestroy");
@@ -301,6 +305,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         super.onStop();
     }
 
+    // Save image before destroying activity
     @Override
     public boolean isFinishing() {
         Log.d(TAG, "onDestroy");
