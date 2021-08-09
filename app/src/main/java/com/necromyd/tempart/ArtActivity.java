@@ -158,6 +158,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
                 .cancelTitle("Cancel")
                 .showIndicator(true)
                 .showValue(true)
+                .initialColor(artView.getDrawingColor())
                 .build()
                 .show(v, new ColorPickerPopup.ColorPickerObserver() {
                     @Override
