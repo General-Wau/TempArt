@@ -23,6 +23,8 @@ import android.widget.SeekBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import top.defaults.colorpicker.ColorPickerPopup;
+
 public class ArtActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ArtView artView;
@@ -114,6 +116,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.undo();
         } else if (v.getId() == R.id.btn_redo) {
             artView.redo();
+        } else if (v.getId() == R.id.btn_palette){
+            showColorDialog(v);
         }
     }
 
@@ -143,6 +147,26 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         dialogLineWidth = currentAlertDialog.create();
         dialogLineWidth.setTitle("Set Line Width");
         dialogLineWidth.show();
+    }
+
+    void showColorDialog(View v){
+        new ColorPickerPopup.Builder(this)
+            .initialColor(Color.BLACK)
+                .enableBrightness(true)
+                .enableAlpha(true)
+                .okTitle("Choose")
+                .cancelTitle("Cancel")
+                .showIndicator(true)
+                .showValue(true)
+                .build()
+                .show(v, new ColorPickerPopup.ColorPickerObserver() {
+                    @Override
+                    public void onColorPicked(int color) {
+                        artView.setDrawingColor(color);
+                    }
+                });
+
+
     }
 
 //    void showColorDialog() {

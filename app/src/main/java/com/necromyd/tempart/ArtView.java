@@ -156,10 +156,12 @@ public class ArtView extends View {
     }
 
 
+    //set drawing color
     public void setDrawingColor(int color) {
         paintLine.setColor(color);
     }
 
+    //return current color
     public int getDrawingColor() {
         return paintLine.getColor();
     }
