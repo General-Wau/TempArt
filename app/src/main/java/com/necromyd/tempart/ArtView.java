@@ -3,6 +3,7 @@ package com.necromyd.tempart;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -176,6 +177,7 @@ public class ArtView extends View {
     //set drawing color
     public void setDrawingColor(int color) {
         paintLine.setColor(color);
+        ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
     //return current color

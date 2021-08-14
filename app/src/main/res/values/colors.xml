@@ -6,4 +6,5 @@
     <color name="colorGray">#9C9C9C</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="whiteAlpha">#60FFFFFF</color>
+    <color name="fabInitial">#716B6B</color>
 </resources>

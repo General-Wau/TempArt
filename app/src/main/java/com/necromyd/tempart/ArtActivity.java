@@ -36,6 +36,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     private SeekBar seekbarWidth, seekbarAlpha;
     private boolean imageSaved;
     private boolean visible = true;
+    static FloatingActionButton fab;
     private static final String TAG = "ArtActivity";
 
     private ImageView btn_brush, btn_palette, btn_picker, btn_eraser, btn_redo, btn_undo,
@@ -56,7 +57,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         // Floating action button functionality
         LinearLayout tools = (LinearLayout) findViewById(R.id.Layout_Tools);
         LinearLayout utils = (LinearLayout) findViewById(R.id.Layout_Util);
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             if (visible) {
                 tools.setVisibility(View.INVISIBLE);
