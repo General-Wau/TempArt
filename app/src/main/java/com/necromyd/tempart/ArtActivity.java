@@ -22,8 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import top.defaults.colorpicker.ColorPickerPopup;
+import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class ArtActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,6 +32,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     private AlertDialog dialogLineWidth;
     private AlertDialog colorDialog;
     private View colorView;
+    public static int initialColor;
     private SeekBar seekbarWidth, seekbarAlpha;
     private boolean imageSaved;
     private boolean visible = true;
@@ -80,6 +80,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         btn_clear = findViewById(R.id.btn_clear);
         btn_save = findViewById(R.id.btn_save);
         btn_layers = findViewById(R.id.btn_layers);
+        initialColor = Color.BLACK;
 
         //Listeners
         btn_brush.setOnClickListener(this);
@@ -117,7 +118,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.undo();
         } else if (v.getId() == R.id.btn_redo) {
             artView.redo();
-        } else if (v.getId() == R.id.btn_palette){
+        } else if (v.getId() == R.id.btn_palette) {
             showColorDialog(v);
         }
 //        else if (v.getId() == R.id.btn_picker){
@@ -153,94 +154,23 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         dialogLineWidth.show();
     }
 
-    void showColorDialog(View v){
-        new ColorPickerPopup.Builder(this)
-            .initialColor(Color.BLACK)
-                .enableBrightness(true)
-                .enableAlpha(false)
-                .okTitle("Choose")
-                .cancelTitle("Cancel")
-                .showIndicator(true)
-                .showValue(true)
-                .initialColor(artView.getDrawingColor())
-                .build()
-                .show(v, new ColorPickerPopup.ColorPickerObserver() {
-                    @Override
-                    public void onColorPicked(int color) {
-                        artView.setDrawingColor(color);
-                    }
-                });
+    // Color Dialog
+    void showColorDialog(View v) {
+        AmbilWarnaDialog dialog = new AmbilWarnaDialog(this, initialColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+            @Override
+            public void onOk(AmbilWarnaDialog dialog, int color) {
+                // color is the color selected by the user.
+                artView.setDrawingColor(color);
+            }
 
+            @Override
+            public void onCancel(AmbilWarnaDialog dialog) {
+                // cancel was selected by the user
+            }
+        });
+        dialog.show();
 
     }
-
-//    void showColorDialog() {
-//        currentAlertDialog = new AlertDialog.Builder(this);
-//        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
-//        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
-//        redSeekBar = view.findViewById(R.id.redSeekBar);
-//        greenSeekBar = view.findViewById(R.id.greenSeekBar);
-//        blueSeekBar = view.findViewById(R.id.blueSeekBar);
-//        colorView = view.findViewById(R.id.colorView);
-//
-//        //register SeekBar event Listeners
-//        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-//        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-//        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-//        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-//
-//        int color = artView.getDrawingColor();
-//        alphaSeekBar.setProgress(Color.alpha(color));
-//        redSeekBar.setProgress(Color.red(color));
-//        greenSeekBar.setProgress(Color.green(color));
-//        blueSeekBar.setProgress(Color.blue(color));
-//
-//        Button setColorButton = view.findViewById(R.id.setColorButton);
-//        setColorButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                artView.setDrawingColor(Color.argb(
-//                        alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-//                        greenSeekBar.getProgress(), blueSeekBar.getProgress()
-//                ));
-//
-//                colorDialog.dismiss();
-//            }
-//        });
-//
-//        currentAlertDialog.setView(view);
-//        currentAlertDialog.setTitle("Choose Color");
-//        colorDialog = currentAlertDialog.create();
-//        colorDialog.show();
-//    }
-
-    //    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
-//        @Override
-//        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//            // tip , future feature could use artView.setBackgroundColor to change the canvas color
-//            artView.setDrawingColor(Color.argb(
-//                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-//                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
-//            ));
-//
-//            //display the current color
-//            colorView.setBackgroundColor(Color.argb(
-//                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-//                    greenSeekBar.getProgress(), blueSeekBar.getProgress()
-//            ));
-//        }
-//
-//        @Override
-//        public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//        }
-//
-//        @Override
-//        public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//        }
-//    };
-//
 
     // Line width seekbar listener
     private final SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {

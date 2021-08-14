@@ -178,6 +178,7 @@ public class ArtView extends View {
     public void setDrawingColor(int color) {
         paintLine.setColor(color);
         ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
+        ArtActivity.initialColor = color;
     }
 
     //return current color
