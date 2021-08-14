@@ -119,6 +119,9 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId() == R.id.btn_palette){
             showColorDialog(v);
         }
+//        else if (v.getId() == R.id.btn_picker){
+//            artView.dropSelectColor(v);
+//        }
     }
 
     // Line width and transparency dialog
@@ -128,7 +131,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         seekbarWidth = view.findViewById(R.id.seekBarId);
         seekbarAlpha = view.findViewById(R.id.alphaSeekBar);
         seekbarWidth.setProgress(artView.getLineWidth());
-        seekbarAlpha.setProgress(100);
+        seekbarAlpha.setProgress(artView.alphaSetting);
 
         Button setLineWidthButton = view.findViewById(R.id.buttonDialogId);
         widthImageView = view.findViewById(R.id.imageViewId);
@@ -153,7 +156,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         new ColorPickerPopup.Builder(this)
             .initialColor(Color.BLACK)
                 .enableBrightness(true)
-                .enableAlpha(true)
+                .enableAlpha(false)
                 .okTitle("Choose")
                 .cancelTitle("Cancel")
                 .showIndicator(true)

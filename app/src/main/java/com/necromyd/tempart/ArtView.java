@@ -38,6 +38,8 @@ public class ArtView extends View {
     private ArrayList<Brush> path;
     private ArrayList<Brush> undo;
     public static String pathString;
+    public int alphaSetting = 100;
+    private int lineWidthSetting = 100;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -73,6 +75,21 @@ public class ArtView extends View {
 
     }
 
+//    //select color from bitmap via touch
+//    public void dropSelectColor(View v){
+//        v.setOnTouchListener(new OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                int color = bitmap.getPixel((int)v.getX(), (int)v.getY());
+//
+//                Toast.makeText(getContext(),"Color : " + color,Toast.LENGTH_SHORT).show();
+//
+//
+//                setDrawingColor(color);
+//                return true;
+//            }
+//        });
+//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -169,6 +186,8 @@ public class ArtView extends View {
     public void setLineWidth(int width, int alpha) {
         paintLine.setStrokeWidth(width);
         paintLine.setAlpha(alpha);
+        alphaSetting = alpha;
+        lineWidthSetting = width;
     }
 
     public int getLineWidth() {
