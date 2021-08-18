@@ -39,7 +39,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     static FloatingActionButton fab;
     private static final String TAG = "ArtActivity";
 
-    private ImageView btn_brush, btn_palette, btn_picker, btn_eraser, btn_redo, btn_undo,
+    static ImageView btn_brush, btn_palette, btn_picker, btn_eraser, btn_redo, btn_undo,
             btn_clear, btn_save, btn_layers;
 
     @Override
@@ -109,7 +109,6 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-
     //Handle tool buttons
     @Override
     public void onClick(View v) {
@@ -120,6 +119,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.redo();
         } else if (v.getId() == R.id.btn_palette) {
             showColorDialog(v);
+        } else if (v.getId() == R.id.btn_layers){
+            artView.changeLayer();
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);

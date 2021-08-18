@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,9 +17,12 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -34,9 +38,13 @@ public class ArtView extends View {
     public static final float TOUCH_TOLERANCE = 5;
     private Bitmap bitmap;
     private Path mPath;
+    private static int layer;
     private float mX, mY;
     private Paint paintLine;
-    private ArrayList<Brush> path;
+    private static ArrayList<Brush> path;
+    private static ArrayList<Brush> layer1;
+    private static ArrayList<Brush> layer2;
+    private static ArrayList<Brush> layer3;
     private ArrayList<Brush> undo;
     public static String pathString;
     public int alphaSetting = 100;
@@ -52,6 +60,7 @@ public class ArtView extends View {
     }
 
     public void init(DisplayMetrics metrics, Bitmap bitmap) {
+        layer = 1;
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
         if (bitmap == null) {
@@ -71,32 +80,47 @@ public class ArtView extends View {
         paintLine.setXfermode(null);
         paintLine.setAlpha(0xff);
 
-        path = new ArrayList<>();
+        layer1 = new ArrayList<>();
+        layer2 = new ArrayList<>();
+        layer3 = new ArrayList<>();
+        path = layer1;
         undo = new ArrayList<>();
 
     }
 
 //    //select color from bitmap via touch
-//    public void dropSelectColor(View v){
-//        v.setOnTouchListener(new OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                int color = bitmap.getPixel((int)v.getX(), (int)v.getY());
-//
-//                Toast.makeText(getContext(),"Color : " + color,Toast.LENGTH_SHORT).show();
-//
-//
-//                setDrawingColor(color);
-//                return true;
-//            }
-//        });
-//    }
+    public void dropSelectColor(View v){
+//        this.setDrawingCacheEnabled(true);
+        v.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                Bitmap bitmapTemp = getDrawingCache(true);
+                int color = bitmap.getPixel((int)v.getX(), (int)v.getY());
+                Toast.makeText(getContext(),"Color : " + color,Toast.LENGTH_SHORT).show();
+                setDrawingColor(color);
+                v.setOnTouchListener(null);
+                return true;
+            }
+        });
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-
-        for (Brush brush : path) {
+// change layer1 to path for rollback
+        for (Brush brush : layer1) {
+            paintLine.setColor(brush.color);
+            paintLine.setStrokeWidth(brush.strokeWidth);
+            paintLine.setMaskFilter(null);
+            canvas.drawPath(brush.path, paintLine);
+        }
+        for (Brush brush : layer2) {
+            paintLine.setColor(brush.color);
+            paintLine.setStrokeWidth(brush.strokeWidth);
+            paintLine.setMaskFilter(null);
+            canvas.drawPath(brush.path, paintLine);
+        }
+        for (Brush brush : layer3) {
             paintLine.setColor(brush.color);
             paintLine.setStrokeWidth(brush.strokeWidth);
             paintLine.setMaskFilter(null);
@@ -113,6 +137,25 @@ public class ArtView extends View {
             invalidate();
         } else {
             Snackbar.make(this, "Nothing to undo !", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    public void changeLayer(){
+
+        if(layer == 1) {
+            layer++;
+            path = layer2;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer2);
+        }
+        else if (layer == 2) {
+            layer++;
+            path = layer3;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer3);
+        }
+        else if (layer == 3) {
+            layer = 1;
+            path = layer1;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer1);
         }
     }
 
