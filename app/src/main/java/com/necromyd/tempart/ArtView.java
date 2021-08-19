@@ -44,6 +44,7 @@ public class ArtView extends View {
     private Path mPath;
     private static int layer;
     private float mX, mY;
+    public boolean imageSaved;
     private Paint paintLine;
     private static ArrayList<Brush> path;
     private static ArrayList<Brush> layer1;
@@ -115,8 +116,9 @@ public class ArtView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-
-            canvas.drawBitmap(loadedBitmap,0,0,paintLine);
+        if(loadedBitmap != null) {
+            canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
+        }
 
         for (Brush brush : layer1) {
             paintLine.setColor(brush.color);
@@ -252,6 +254,7 @@ public class ArtView extends View {
     }
 
     private void touchStart(float x, float y) {
+        imageSaved = false;
         mPath = new Path();
         Brush draw = new Brush(paintLine.getColor(), (int) paintLine.getStrokeWidth(), mPath);
         path.add(draw);
@@ -328,6 +331,7 @@ public class ArtView extends View {
                 e.printStackTrace();
             }
         }
+        imageSaved = true;
     }
 
 

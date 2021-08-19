@@ -32,9 +32,9 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     private AlertDialog dialogLineWidth;
     private AlertDialog colorDialog;
     private View colorView;
+    private boolean declinedToSaveImage;
     public static int initialColor;
     private SeekBar seekbarWidth, seekbarAlpha;
-    private boolean imageSaved;
     private boolean visible = true;
     static FloatingActionButton fab;
     private static final String TAG = "ArtActivity";
@@ -49,7 +49,6 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         artView = findViewById(R.id.artView);
-        imageSaved = false;
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -123,6 +122,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.changeLayer();
         } else if (v.getId() == R.id.btn_clear){
             artView.clear();
+        } else if (v.getId() == R.id.btn_save){
+            artView.saveImage();
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);
@@ -208,13 +209,9 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     //Save image before exit
     @Override
     public void onBackPressed() {
-        if (imageSaved) {
+        if (artView.imageSaved || artView.getPath().isEmpty()) {
             super.onBackPressed();
         }
-//        if (artView.getPathMap().isEmpty()) {
-////            Intent c = new Intent(getApplicationContext(), MainActivity.class);
-////            startActivity(c);
-//            super.onBackPressed();}
         else {
             currentAlertDialog = new AlertDialog.Builder(this);
             currentAlertDialog.setCancelable(false);
@@ -225,7 +222,6 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onClick(View v) {
                     artView.saveImage();
-                    imageSaved = true;
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
                     ArtActivity.super.onBackPressed();
@@ -234,7 +230,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             noButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    imageSaved = true;
+                    declinedToSaveImage = true;
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
                     ArtActivity.super.onBackPressed();
@@ -259,9 +255,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     protected void onStop() {
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
-            if (!imageSaved) {
+            if (!declinedToSaveImage & !artView.imageSaved) {
                 artView.saveImage();
-                imageSaved = true;
             }
         }
         super.onStop();
@@ -272,9 +267,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     public boolean isFinishing() {
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
-            if (!imageSaved) {
+            if (!declinedToSaveImage & !artView.imageSaved) {
                 artView.saveImage();
-                imageSaved = true;
             }
         }
         return super.isFinishing();
