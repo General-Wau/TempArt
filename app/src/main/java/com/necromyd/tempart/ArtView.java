@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -24,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -38,7 +40,7 @@ import java.util.Objects;
 public class ArtView extends View {
 
     public static final float TOUCH_TOLERANCE = 5;
-    private Bitmap bitmap;
+    private Bitmap bitmap, loadedBitmap;
     private Path mPath;
     private static int layer;
     private float mX, mY;
@@ -61,14 +63,22 @@ public class ArtView extends View {
         return path;
     }
 
+
     public void init(DisplayMetrics metrics, Bitmap bitmap) {
         layer = 1;
+        layer1 = new ArrayList<>();
+        layer2 = new ArrayList<>();
+        layer3 = new ArrayList<>();
+        path = layer1;
+        undo = new ArrayList<>();
+
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
-        if (bitmap == null) {
-            this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        } else {
-            this.bitmap = Bitmap.createBitmap(bitmap);
+
+        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        if (bitmap != null) {
+            loadedBitmap = Bitmap.createBitmap(bitmap);
         }
 
         paintLine = new Paint();
@@ -80,13 +90,9 @@ public class ArtView extends View {
         paintLine.setStrokeWidth(1);
         paintLine.setStrokeCap(Paint.Cap.ROUND);
         paintLine.setXfermode(null);
-        paintLine.setAlpha(0xff);
+        paintLine.setAlpha(255);
 
-        layer1 = new ArrayList<>();
-        layer2 = new ArrayList<>();
-        layer3 = new ArrayList<>();
-        path = layer1;
-        undo = new ArrayList<>();
+
 
     }
 
@@ -109,7 +115,9 @@ public class ArtView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-// change layer1 to path for rollback
+
+            canvas.drawBitmap(loadedBitmap,0,0,paintLine);
+
         for (Brush brush : layer1) {
             paintLine.setColor(brush.color);
             paintLine.setStrokeWidth(brush.strokeWidth);

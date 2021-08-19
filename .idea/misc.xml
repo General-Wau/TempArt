@@ -3,11 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_erase.xml" value="0.3828125" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_layer1.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_layer2.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_layer3.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_layers.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_line_weight.xml" value="0.37864583333333335" />
+        <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/drawable/ic_baseline_new_page.xml" value="0.3828125" />
         <entry key="..\:/Users/DrDrax/Documents/Android/TempArt/app/src/main/res/layout/activity_art.xml" value="0.35" />
       </map>
     </option>
