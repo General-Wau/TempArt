@@ -121,6 +121,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             showColorDialog(v);
         } else if (v.getId() == R.id.btn_layers){
             artView.changeLayer();
+        } else if (v.getId() == R.id.btn_clear){
+            artView.clear();
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);

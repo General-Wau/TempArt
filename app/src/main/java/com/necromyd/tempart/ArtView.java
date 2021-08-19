@@ -1,8 +1,10 @@
 package com.necromyd.tempart;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -136,9 +138,44 @@ public class ArtView extends View {
             undo.add(path.remove(path.size() - 1));
             invalidate();
         } else {
-            Snackbar.make(this, "Nothing to undo !", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(this, "Nothing to undo in this layer !", Snackbar.LENGTH_SHORT).show();
         }
     }
+
+    public void clear(){
+        AlertDialog.Builder clearConfirm = new AlertDialog.Builder(getContext());
+        clearConfirm.setCancelable(false);
+        clearConfirm.setTitle("Save the image and clear everything ?");
+        clearConfirm.setPositiveButton("Save and Clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveImage();
+                layer1.clear();
+                layer2.clear();
+                layer3.clear();
+                invalidate();
+            }
+        });
+        clearConfirm.setNeutralButton("Just clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //clear code here
+                layer1.clear();
+                layer2.clear();
+                layer3.clear();
+                invalidate();
+            }
+        });
+        clearConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = clearConfirm.create();
+        dialog.show();
+    }
+
 
     public void changeLayer(){
 
