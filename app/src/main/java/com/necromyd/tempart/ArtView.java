@@ -14,6 +14,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -44,10 +45,12 @@ public class ArtView extends View {
     private static ArrayList<Brush> layer3;
     private ArrayList<Brush> undo;
     public static String pathString;
+    private Context context;
     public int alphaSetting = 100;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
     }
 
 
@@ -73,7 +76,6 @@ public class ArtView extends View {
         if (bitmap != null) {
             loadedBitmap = Bitmap.createBitmap(bitmap);
         }
-
 
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
@@ -281,8 +283,9 @@ public class ArtView extends View {
         return (int) paintLine.getStrokeWidth();
     }
 
-    public void erase(boolean erase) {
+    public void erase() {
             paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            paintLine.setStrokeWidth(getLineWidth());
     }
 
 
@@ -301,11 +304,11 @@ public class ArtView extends View {
             fileOutputStream = new FileOutputStream(myPath);
             //Use the compress method on the BitMap object to write image to the OutputStream
 
-            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+//            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             draw(canvas);
-
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+            MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename , "made with TempArt");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -321,6 +324,7 @@ public class ArtView extends View {
                 e.printStackTrace();
             }
         }
+
         imageSaved = true;
     }
 

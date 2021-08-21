@@ -49,6 +49,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         artView = findViewById(R.id.artView);
+        artView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -125,7 +126,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId() == R.id.btn_save){
             artView.saveImage();
         } else if (v.getId() == R.id.btn_eraser){
-            artView.erase(true);
+            artView.erase();
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);

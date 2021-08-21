@@ -7,4 +7,5 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="whiteAlpha">#60FFFFFF</color>
     <color name="fabInitial">#716B6B</color>
+    <color name="transparent">#00ffffff</color>
 </resources>
