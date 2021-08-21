@@ -124,6 +124,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.clear();
         } else if (v.getId() == R.id.btn_save){
             artView.saveImage();
+        } else if (v.getId() == R.id.btn_eraser){
+            artView.erase(true);
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);

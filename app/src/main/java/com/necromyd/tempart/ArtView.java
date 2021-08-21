@@ -7,12 +7,12 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -20,22 +20,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.google.android.material.snackbar.Snackbar;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
 
 public class ArtView extends View {
 
@@ -53,7 +45,6 @@ public class ArtView extends View {
     private ArrayList<Brush> undo;
     public static String pathString;
     public int alphaSetting = 100;
-    private int lineWidthSetting = 100;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -65,6 +56,7 @@ public class ArtView extends View {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void init(DisplayMetrics metrics, Bitmap bitmap) {
         layer = 1;
         layer1 = new ArrayList<>();
@@ -76,11 +68,12 @@ public class ArtView extends View {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
 
-        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888, true);
 
         if (bitmap != null) {
             loadedBitmap = Bitmap.createBitmap(bitmap);
         }
+
 
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
@@ -94,18 +87,17 @@ public class ArtView extends View {
         paintLine.setAlpha(255);
 
 
-
     }
 
-//    //select color from bitmap via touch
-    public void dropSelectColor(View v){
+    //    //select color from bitmap via touch
+    public void dropSelectColor(View v) {
 //        this.setDrawingCacheEnabled(true);
         v.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 //                Bitmap bitmapTemp = getDrawingCache(true);
-                int color = bitmap.getPixel((int)v.getX(), (int)v.getY());
-                Toast.makeText(getContext(),"Color : " + color,Toast.LENGTH_SHORT).show();
+                int color = bitmap.getPixel((int) v.getX(), (int) v.getY());
+                Toast.makeText(getContext(), "Color : " + color, Toast.LENGTH_SHORT).show();
                 setDrawingColor(color);
                 v.setOnTouchListener(null);
                 return true;
@@ -116,9 +108,10 @@ public class ArtView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-        if(loadedBitmap != null) {
+        if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
         }
+
 
         for (Brush brush : layer1) {
             paintLine.setColor(brush.color);
@@ -138,6 +131,8 @@ public class ArtView extends View {
             paintLine.setMaskFilter(null);
             canvas.drawPath(brush.path, paintLine);
         }
+
+
         canvas.drawBitmap(bitmap, 0, 0, paintLine);
 
         canvas.restore();
@@ -152,7 +147,7 @@ public class ArtView extends View {
         }
     }
 
-    public void clear(){
+    public void clear() {
         AlertDialog.Builder clearConfirm = new AlertDialog.Builder(getContext());
         clearConfirm.setCancelable(false);
         clearConfirm.setTitle("Save the image and clear everything ?");
@@ -187,19 +182,17 @@ public class ArtView extends View {
     }
 
 
-    public void changeLayer(){
+    public void changeLayer() {
 
-        if(layer == 1) {
+        if (layer == 1) {
             layer++;
             path = layer2;
             ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer2);
-        }
-        else if (layer == 2) {
+        } else if (layer == 2) {
             layer++;
             path = layer3;
             ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer3);
-        }
-        else if (layer == 3) {
+        } else if (layer == 3) {
             layer = 1;
             path = layer1;
             ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer1);
@@ -278,29 +271,26 @@ public class ArtView extends View {
     }
 
     public void setLineWidth(int width, int alpha) {
+        paintLine.setXfermode(null);
         paintLine.setStrokeWidth(width);
         paintLine.setAlpha(alpha);
         alphaSetting = alpha;
-        lineWidthSetting = width;
     }
 
     public int getLineWidth() {
         return (int) paintLine.getStrokeWidth();
     }
 
-//    public void clear() {
-//        pathMap.clear(); // removes all of the paths
-//        previousPointMap.clear();
-//        bitmap.eraseColor(Color.WHITE);
-//        invalidate(); // refresh the screen
-//    }
+    public void erase(boolean erase) {
+            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+    }
 
 
     @SuppressLint("WrongThread")
     public void saveImage() {
         ContextWrapper cw = new ContextWrapper(getContext());
         String filename = "TempART" + System.currentTimeMillis();
-        // path to /data/data/yourapp/app_data/imageDir
+        // path to /data/data/your app/app_data/imageDir
         File directory = cw.getDir("files", Context.MODE_PRIVATE);
         pathString = cw.getDir("files", Context.MODE_PRIVATE).toString();
         // create imageDir
