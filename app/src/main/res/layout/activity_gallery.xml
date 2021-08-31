@@ -6,14 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".GalleryActivity">
 
-    <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/gallery_gridLayout"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/galleryRecycleViewId"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </androidx.gridlayout.widget.GridLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

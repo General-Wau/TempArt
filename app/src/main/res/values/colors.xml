@@ -3,6 +3,9 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="gray">#9C9C9C</color>
-    <color name="white">#FFFFFF</color>
+    <color name="colorGray">#9C9C9C</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="whiteAlpha">#60FFFFFF</color>
+    <color name="fabInitial">#716B6B</color>
+    <color name="transparent">#00ffffff</color>
 </resources>

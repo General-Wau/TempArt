@@ -1,6 +1,7 @@
 package com.necromyd.tempart;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         newArt = (Button) findViewById(R.id.btn_mainArt);
         gallery = (Button) findViewById(R.id.btn_mainGallery);
         newArt.setOnClickListener(this);
