@@ -37,25 +37,34 @@ public class ArtView extends View {
     private Path mPath;
     private static int layer;
     private float mX, mY;
-    public boolean imageSaved;
-    private Paint paintLine;
-    private static ArrayList<Brush> path;
-    private static ArrayList<Brush> layer1;
-    private static ArrayList<Brush> layer2;
-    private static ArrayList<Brush> layer3;
-    private ArrayList<Brush> undo;
+    public boolean imageSaved, setErase;
+    private Paint paintLine,canvasPaint;
+    private static ArrayList<Path> path;
+    private static ArrayList<Path> layer1;
+    private static ArrayList<Path> layer2;
+    private static ArrayList<Path> layer3;
+    private ArrayList<Path> undo;
+    private Canvas drawCanvas;
     public static String pathString;
     private Context context;
+    public float lastBrushSize;
+    public int paintColor = Color.BLACK;
     public int alphaSetting = 100;
 
     public ArtView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        setupDrawing();
     }
 
-
-    public ArrayList<Brush> getPath() {
+    public ArrayList<Path> getPath() {
         return path;
+    }
+
+    public void setErase(boolean isErase){
+        setErase= isErase;
+        if(setErase) paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        else paintLine.setXfermode(null);
     }
 
 
@@ -76,19 +85,22 @@ public class ArtView extends View {
         if (bitmap != null) {
             loadedBitmap = Bitmap.createBitmap(bitmap);
         }
+    }
 
+    public void setupDrawing(){
+        mPath = new Path();
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
         paintLine.setDither(true);
         paintLine.setStrokeJoin(Paint.Join.ROUND);
         paintLine.setStyle(Paint.Style.STROKE);
-        paintLine.setColor(Color.BLACK);
+        paintLine.setColor(paintColor);
         paintLine.setStrokeWidth(1);
         paintLine.setStrokeCap(Paint.Cap.ROUND);
         paintLine.setXfermode(null);
         paintLine.setAlpha(255);
-
-
+        canvasPaint = new Paint(Paint.DITHER_FLAG);
+        lastBrushSize = paintLine.getStrokeWidth();
     }
 
     //    //select color from bitmap via touch
@@ -109,35 +121,37 @@ public class ArtView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.save();
+//        canvas.save();
         if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
+        }else{
+            canvas.drawBitmap(bitmap, 0, 0, canvasPaint);
+        }
+
+        for (Path path : layer1) {
+
+            canvas.drawPath(mPath, paintLine);
+        }
+        for (Path path : layer2) {
+
+            canvas.drawPath(mPath, paintLine);
+        }
+        for (Path path : layer3) {
+
+            canvas.drawPath(mPath, paintLine);
         }
 
 
-        for (Brush brush : layer1) {
-            paintLine.setColor(brush.color);
-            paintLine.setStrokeWidth(brush.strokeWidth);
-            paintLine.setMaskFilter(null);
-            canvas.drawPath(brush.path, paintLine);
-        }
-        for (Brush brush : layer2) {
-            paintLine.setColor(brush.color);
-            paintLine.setStrokeWidth(brush.strokeWidth);
-            paintLine.setMaskFilter(null);
-            canvas.drawPath(brush.path, paintLine);
-        }
-        for (Brush brush : layer3) {
-            paintLine.setColor(brush.color);
-            paintLine.setStrokeWidth(brush.strokeWidth);
-            paintLine.setMaskFilter(null);
-            canvas.drawPath(brush.path, paintLine);
-        }
+//        canvas.drawBitmap(bitmap, 0, 0, paintLine);
 
+//        canvas.restore();
+    }
 
-        canvas.drawBitmap(bitmap, 0, 0, paintLine);
-
-        canvas.restore();
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        drawCanvas = new Canvas(bitmap);
     }
 
     public void undo() {
@@ -157,6 +171,7 @@ public class ArtView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 saveImage();
+                drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
                 layer1.clear();
                 layer2.clear();
                 layer3.clear();
@@ -167,6 +182,7 @@ public class ArtView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //clear code here
+                drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
                 layer1.clear();
                 layer2.clear();
                 layer3.clear();
@@ -212,59 +228,33 @@ public class ArtView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-
+        float touchX = event.getX();
+        float touchY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                touchStart(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                touchUp();
-                invalidate();
+                mPath.moveTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_MOVE:
-                touchMove(x, y);
-                invalidate();
+                mPath.lineTo(touchX, touchY);
                 break;
+            case MotionEvent.ACTION_UP:
+                drawCanvas.drawPath(mPath, paintLine);
+                path.add(mPath);
+                mPath.reset();
+                break;
+            default:
+                return false;
         }
+        invalidate();
         return true;
     }
-
-    private void touchUp() {
-        mPath.lineTo(mX, mY);
-    }
-
-    private void touchMove(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            mX = x;
-            mY = y;
-        }
-
-    }
-
-    private void touchStart(float x, float y) {
-        imageSaved = false;
-        mPath = new Path();
-        Brush draw = new Brush(paintLine.getColor(), (int) paintLine.getStrokeWidth(), mPath);
-        path.add(draw);
-        mPath.reset();
-        mPath.moveTo(x, y);
-        mX = x;
-        mY = y;
-    }
-
 
     //set drawing color
     public void setDrawingColor(int color) {
         paintLine.setColor(color);
         ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
         ArtActivity.initialColor = color;
+        paintColor = color;
     }
 
     //return current color
@@ -273,19 +263,14 @@ public class ArtView extends View {
     }
 
     public void setLineWidth(int width, int alpha) {
-        paintLine.setXfermode(null);
         paintLine.setStrokeWidth(width);
         paintLine.setAlpha(alpha);
         alphaSetting = alpha;
+        lastBrushSize = width;
     }
 
     public int getLineWidth() {
         return (int) paintLine.getStrokeWidth();
-    }
-
-    public void erase() {
-            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            paintLine.setStrokeWidth(getLineWidth());
     }
 
 

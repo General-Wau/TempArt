@@ -112,7 +112,10 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     //Handle tool buttons
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btn_brush) showLineWidthDialog();
+        if (v.getId() == R.id.btn_brush) {
+            artView.setupDrawing();
+            showLineWidthDialog();
+        }
         else if (v.getId() == R.id.btn_undo) {
             artView.undo();
         } else if (v.getId() == R.id.btn_redo) {
@@ -126,7 +129,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId() == R.id.btn_save){
             artView.saveImage();
         } else if (v.getId() == R.id.btn_eraser){
-            artView.erase();
+            artView.setErase(true);
+            artView.setLineWidth((int)artView.lastBrushSize,255);
         }
 //        else if (v.getId() == R.id.btn_picker){
 //            artView.dropSelectColor(v);
