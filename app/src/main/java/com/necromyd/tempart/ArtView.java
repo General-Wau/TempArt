@@ -38,12 +38,14 @@ public class ArtView extends View {
     private static int layer;
     private float mX, mY;
     public boolean imageSaved;
-    private Paint paintLine;
+    private Paint paintLine, tPaintline;
     private static ArrayList<Brush> path;
     private static ArrayList<Brush> layer1;
     private static ArrayList<Brush> layer2;
     private static ArrayList<Brush> layer3;
     private ArrayList<Brush> undo;
+    private boolean eraseMode = false;
+    private int lastPaintColor;
     public static String pathString;
     private Context context;
     public int alphaSetting = 100;
@@ -52,12 +54,6 @@ public class ArtView extends View {
         super(context, attrs);
         this.context = context;
     }
-
-
-    public ArrayList<Brush> getPath() {
-        return path;
-    }
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void init(DisplayMetrics metrics, Bitmap bitmap) {
@@ -70,13 +66,14 @@ public class ArtView extends View {
 
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
-
         this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888, true);
 
         if (bitmap != null) {
             loadedBitmap = Bitmap.createBitmap(bitmap);
         }
 
+        tPaintline = new Paint();
+        tPaintline.setColor(Color.TRANSPARENT);
         paintLine = new Paint();
         paintLine.setAntiAlias(true);
         paintLine.setDither(true);
@@ -87,24 +84,6 @@ public class ArtView extends View {
         paintLine.setStrokeCap(Paint.Cap.ROUND);
         paintLine.setXfermode(null);
         paintLine.setAlpha(255);
-
-
-    }
-
-    //    //select color from bitmap via touch
-    public void dropSelectColor(View v) {
-//        this.setDrawingCacheEnabled(true);
-        v.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-//                Bitmap bitmapTemp = getDrawingCache(true);
-                int color = bitmap.getPixel((int) v.getX(), (int) v.getY());
-                Toast.makeText(getContext(), "Color : " + color, Toast.LENGTH_SHORT).show();
-                setDrawingColor(color);
-                v.setOnTouchListener(null);
-                return true;
-            }
-        });
     }
 
     @Override
@@ -112,6 +91,8 @@ public class ArtView extends View {
         canvas.save();
         if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
+        } else {
+            canvas.drawBitmap(bitmap, 0, 0, tPaintline);
         }
 
 
@@ -134,79 +115,16 @@ public class ArtView extends View {
             canvas.drawPath(brush.path, paintLine);
         }
 
-
-        canvas.drawBitmap(bitmap, 0, 0, paintLine);
-
         canvas.restore();
     }
 
-    public void undo() {
-        if (path.size() > 0) {
-            undo.add(path.remove(path.size() - 1));
-            invalidate();
-        } else {
-            Snackbar.make(this, "Nothing to undo in this layer !", Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    public void clear() {
-        AlertDialog.Builder clearConfirm = new AlertDialog.Builder(getContext());
-        clearConfirm.setCancelable(false);
-        clearConfirm.setTitle("Save the image and clear everything ?");
-        clearConfirm.setPositiveButton("Save and Clear", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                saveImage();
-                layer1.clear();
-                layer2.clear();
-                layer3.clear();
-                invalidate();
-            }
-        });
-        clearConfirm.setNeutralButton("Just clear", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //clear code here
-                layer1.clear();
-                layer2.clear();
-                layer3.clear();
-                invalidate();
-            }
-        });
-        clearConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = clearConfirm.create();
-        dialog.show();
-    }
-
-
-    public void changeLayer() {
-
-        if (layer == 1) {
-            layer++;
-            path = layer2;
-            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer2);
-        } else if (layer == 2) {
-            layer++;
-            path = layer3;
-            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer3);
-        } else if (layer == 3) {
-            layer = 1;
-            path = layer1;
-            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer1);
-        }
-    }
-
-    public void redo() {
-        if (undo.size() > 0) {
-            path.add(undo.remove(undo.size() - 1));
-            invalidate();
-        } else {
-            Snackbar.make(this, "Nothing to redo !", Snackbar.LENGTH_SHORT).show();
+    public void erase(boolean eraseMode) {
+        if(eraseMode){
+            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            paintLine.setColor(Color.TRANSPARENT);
+        }else {
+            paintLine.setXfermode(null);
+            paintLine.setColor(lastPaintColor);
         }
     }
 
@@ -245,13 +163,12 @@ public class ArtView extends View {
             mX = x;
             mY = y;
         }
-
     }
 
     private void touchStart(float x, float y) {
         imageSaved = false;
         mPath = new Path();
-        Brush draw = new Brush(paintLine.getColor(), (int) paintLine.getStrokeWidth(), mPath);
+        Brush draw = new Brush(getDrawingColor(), (int) getLineWidth(), mPath);
         path.add(draw);
         mPath.reset();
         mPath.moveTo(x, y);
@@ -259,36 +176,107 @@ public class ArtView extends View {
         mY = y;
     }
 
-
-    //set drawing color
-    public void setDrawingColor(int color) {
-        paintLine.setColor(color);
-        ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
-        ArtActivity.initialColor = color;
-    }
-
-    //return current color
-    public int getDrawingColor() {
-        return paintLine.getColor();
-    }
-
     public void setLineWidth(int width, int alpha) {
-        paintLine.setXfermode(null);
+        erase(false);
         paintLine.setStrokeWidth(width);
         paintLine.setAlpha(alpha);
         alphaSetting = alpha;
     }
 
+    public ArrayList<Brush> getPath() {
+        return path;
+    }
+    public void setDrawingColor(int color) {
+        paintLine.setColor(color);
+        ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
+        ArtActivity.initialColor = color;
+        lastPaintColor = color;
+    }
+    public void dropSelectColor(View v) {
+//        this.setDrawingCacheEnabled(true);
+        v.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                Bitmap bitmapTemp = getDrawingCache(true);
+                int color = bitmap.getPixel((int) v.getX(), (int) v.getY());
+                Toast.makeText(getContext(), "Color : " + color, Toast.LENGTH_SHORT).show();
+                setDrawingColor(color);
+                v.setOnTouchListener(null);
+                return true;
+            }
+        });
+    }
+    public void clear() {
+        AlertDialog.Builder clearConfirm = new AlertDialog.Builder(getContext());
+        clearConfirm.setCancelable(false);
+        clearConfirm.setTitle("Save the image and clear everything ?");
+        clearConfirm.setPositiveButton("Save and Clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveImage();
+                layer1.clear();
+                layer2.clear();
+                layer3.clear();
+                invalidate();
+            }
+        });
+        clearConfirm.setNeutralButton("Just clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //clear code here
+                layer1.clear();
+                layer2.clear();
+                layer3.clear();
+                invalidate();
+            }
+        });
+        clearConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = clearConfirm.create();
+        dialog.show();
+    }
+    public void changeLayer() {
+
+        if (layer == 1) {
+            layer++;
+            path = layer2;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer2);
+        } else if (layer == 2) {
+            layer++;
+            path = layer3;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer3);
+        } else if (layer == 3) {
+            layer = 1;
+            path = layer1;
+            ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer1);
+        }
+    }
     public int getLineWidth() {
         return (int) paintLine.getStrokeWidth();
     }
-
-    public void erase() {
-            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            paintLine.setStrokeWidth(getLineWidth());
+    public int getDrawingColor() {
+        return paintLine.getColor();
     }
-
-
+    public void redo() {
+        if (undo.size() > 0) {
+            path.add(undo.remove(undo.size() - 1));
+            invalidate();
+        } else {
+            Snackbar.make(this, "Nothing to redo !", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+    public void undo() {
+        if (path.size() > 0) {
+            undo.add(path.remove(path.size() - 1));
+            invalidate();
+        } else {
+            Snackbar.make(this, "Nothing to undo in this layer !", Snackbar.LENGTH_SHORT).show();
+        }
+    }
     @SuppressLint("WrongThread")
     public void saveImage() {
         ContextWrapper cw = new ContextWrapper(getContext());
