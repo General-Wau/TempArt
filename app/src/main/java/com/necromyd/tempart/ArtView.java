@@ -128,18 +128,18 @@ public class ArtView extends View {
             canvas.drawBitmap(bitmap, 0, 0, canvasPaint);
         }
 
-        for (Path path : layer1) {
-
-            canvas.drawPath(mPath, paintLine);
-        }
-        for (Path path : layer2) {
-
-            canvas.drawPath(mPath, paintLine);
-        }
-        for (Path path : layer3) {
-
-            canvas.drawPath(mPath, paintLine);
-        }
+//        for (Path path : layer1) {
+//
+//            canvas.drawPath(mPath, paintLine);
+//        }
+//        for (Path path : layer2) {
+//
+//            canvas.drawPath(mPath, paintLine);
+//        }
+//        for (Path path : layer3) {
+//
+//            canvas.drawPath(mPath, paintLine);
+//        }
 
 
 //        canvas.drawBitmap(bitmap, 0, 0, paintLine);
@@ -232,15 +232,19 @@ public class ArtView extends View {
         float touchY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+//                path.add(mPath);
+                mPath.reset();
                 mPath.moveTo(touchX, touchY);
+                invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 mPath.lineTo(touchX, touchY);
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 drawCanvas.drawPath(mPath, paintLine);
-                path.add(mPath);
-                mPath.reset();
+//                mPath.reset();
+                invalidate();
                 break;
             default:
                 return false;
