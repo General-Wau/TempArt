@@ -121,7 +121,7 @@ public class ArtView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-//        canvas.save();
+        canvas.save();
         if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
         }else{
@@ -140,11 +140,8 @@ public class ArtView extends View {
 //
 //            canvas.drawPath(mPath, paintLine);
 //        }
-
-
-//        canvas.drawBitmap(bitmap, 0, 0, paintLine);
-
-//        canvas.restore();
+        drawCanvas.drawPath(mPath, paintLine);
+        canvas.restore();
     }
 
     @Override
@@ -233,6 +230,7 @@ public class ArtView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
 //                path.add(mPath);
+                mPath = new Path();
                 mPath.reset();
                 mPath.moveTo(touchX, touchY);
                 invalidate();
@@ -242,8 +240,7 @@ public class ArtView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                drawCanvas.drawPath(mPath, paintLine);
-//                mPath.reset();
+//                mPath.lineTo(touchX,touchY);
                 invalidate();
                 break;
             default:
