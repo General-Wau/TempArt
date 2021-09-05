@@ -19,5 +19,9 @@
     <string name="floating_save_button">Floating Save Button</string>
     <string name="show_menu">Show menu</string>
     <string name="width">Width</string>
+    <string name="open_amp_edit">Open &amp; edit</string>
+    <string name="gallery">Gallery</string>
+    <string name="new_art">New Art</string>
+    <string name="temp_art">TEMP ART</string>
 
 </resources>
