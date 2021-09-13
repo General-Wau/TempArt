@@ -67,12 +67,13 @@ public class ArtView extends View {
 
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
-        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888, true);
+
 
         if (bitmap != null) {
             loadedBitmap = scale(bitmap, width, height);
+        }else {
+            this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888, true);
         }
-
         tPaintline = new Paint();
         tPaintline.setColor(Color.TRANSPARENT);
         paintLine = new Paint();
@@ -92,6 +93,7 @@ public class ArtView extends View {
         canvas.save();
         if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
+            canvas.clipRect(0,0,loadedBitmap.getWidth(),loadedBitmap.getHeight());
         } else {
             canvas.drawBitmap(bitmap, 0, 0, tPaintline);
         }
@@ -318,7 +320,7 @@ public class ArtView extends View {
     }
 
     // Scale a bitmap preserving the aspect ratio.
-    private Bitmap scale(Bitmap bitmap, int maxWidth, int maxHeight) {
+    public Bitmap scale(Bitmap bitmap, int maxWidth, int maxHeight) {
         // Determine the constrained dimension, which determines both dimensions.
         int width;
         int height;
