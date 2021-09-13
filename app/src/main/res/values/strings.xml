@@ -23,5 +23,6 @@
     <string name="gallery">Gallery</string>
     <string name="new_art">New Art</string>
     <string name="temp_art">TEMP ART</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

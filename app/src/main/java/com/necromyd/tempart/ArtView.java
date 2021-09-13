@@ -121,15 +121,15 @@ public class ArtView extends View {
         canvas.restore();
     }
 
-    public void erase(boolean eraseMode) {
-        if(eraseMode){
-            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            paintLine.setColor(Color.TRANSPARENT);
-        }else {
-            paintLine.setXfermode(null);
-            paintLine.setColor(lastPaintColor);
-        }
-    }
+//    public void erase(boolean eraseMode) {
+//        if(eraseMode){
+//            paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+//            paintLine.setColor(Color.TRANSPARENT);
+//        }else {
+//            paintLine.setXfermode(null);
+//            paintLine.setColor(lastPaintColor);
+//        }
+//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -180,7 +180,7 @@ public class ArtView extends View {
     }
 
     public void setLineWidth(int width, int alpha) {
-        erase(false);
+//        erase(false);
         paintLine.setStrokeWidth(width);
         paintLine.setAlpha(alpha);
         alphaSetting = alpha;
@@ -194,21 +194,23 @@ public class ArtView extends View {
         ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
         ArtActivity.initialColor = color;
         lastPaintColor = color;
+        ArtActivity.colorArrayList.remove(0);
+        ArtActivity.colorArrayList.add(color);
     }
-    public void dropSelectColor(View v) {
-//        this.setDrawingCacheEnabled(true);
-        v.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-//                Bitmap bitmapTemp = getDrawingCache(true);
-                int color = bitmap.getPixel((int) v.getX(), (int) v.getY());
-                Toast.makeText(getContext(), "Color : " + color, Toast.LENGTH_SHORT).show();
-                setDrawingColor(color);
-                v.setOnTouchListener(null);
-                return true;
-            }
-        });
-    }
+//    public void dropSelectColor(View v) {
+////        this.setDrawingCacheEnabled(true);
+//        v.setOnTouchListener(new OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+////                Bitmap bitmapTemp = getDrawingCache(true);
+//                int color = bitmap.getPixel((int) v.getX(), (int) v.getY());
+//                Toast.makeText(getContext(), "Color : " + color, Toast.LENGTH_SHORT).show();
+//                setDrawingColor(color);
+//                v.setOnTouchListener(null);
+//                return true;
+//            }
+//        });
+//    }
     public void clear() {
         AlertDialog.Builder clearConfirm = new AlertDialog.Builder(getContext());
         clearConfirm.setCancelable(false);

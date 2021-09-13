@@ -69,12 +69,12 @@
             android:layout_marginBottom="10dp"
             app:srcCompat="@drawable/ic_baseline_colorize" />
 
-        <ImageView
-            android:id="@+id/btn_eraser"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            app:srcCompat="@drawable/ic_baseline_erase" />
+<!--        <ImageView-->
+<!--            android:id="@+id/btn_eraser"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginBottom="10dp"-->
+<!--            app:srcCompat="@drawable/ic_baseline_erase" />-->
 
         <ImageView
             android:id="@+id/btn_redo"

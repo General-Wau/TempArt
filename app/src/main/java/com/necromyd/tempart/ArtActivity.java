@@ -23,6 +23,9 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class ArtActivity extends AppCompatActivity implements View.OnClickListener {
@@ -39,6 +42,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
     private boolean visible = true;
     static FloatingActionButton fab;
     private static final String TAG = "ArtActivity";
+    public static ArrayList<Integer> colorArrayList;
 
     static ImageView btn_brush, btn_palette, btn_picker, btn_eraser, btn_redo, btn_undo,
             btn_clear, btn_save, btn_layers;
@@ -75,7 +79,7 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         btn_brush = findViewById(R.id.btn_brush);
         btn_palette = findViewById(R.id.btn_palette);
         btn_picker = findViewById(R.id.btn_picker);
-        btn_eraser = findViewById(R.id.btn_eraser);
+//        btn_eraser = findViewById(R.id.btn_eraser);
         btn_redo = findViewById(R.id.btn_redo);
         btn_undo = findViewById(R.id.btn_undo);
         btn_clear = findViewById(R.id.btn_clear);
@@ -87,13 +91,14 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         btn_brush.setOnClickListener(this);
         btn_palette.setOnClickListener(this);
         btn_picker.setOnClickListener(this);
-        btn_eraser.setOnClickListener(this);
+//        btn_eraser.setOnClickListener(this);
         btn_redo.setOnClickListener(this);
         btn_undo.setOnClickListener(this);
         btn_clear.setOnClickListener(this);
         btn_save.setOnClickListener(this);
         btn_layers.setOnClickListener(this);
 
+        colorArrayList = setUpColors();
 
         // Used when choosing to edit a picture from the gallery . It will fetch it's file path
         Intent intent = getIntent();
@@ -126,12 +131,13 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             artView.clear();
         } else if (v.getId() == R.id.btn_save){
             artView.saveImage();
-        } else if (v.getId() == R.id.btn_eraser){
-            artView.erase(true);
         }
-//        else if (v.getId() == R.id.btn_picker){
-//            artView.dropSelectColor(v);
+//        else if (v.getId() == R.id.btn_eraser){
+//            artView.erase(true);
 //        }
+        else if (v.getId() == R.id.btn_picker){
+            showPickerDialog();
+        }
     }
 
     // Line width and transparency dialog
@@ -162,6 +168,185 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         dialogLineWidth.show();
     }
 
+    void showPickerDialog() {
+        currentAlertDialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
+
+        Button cancel = view.findViewById(R.id.setColorButton);
+        ImageView img1 = view.findViewById(R.id.imgView1);
+        ImageView img2 = view.findViewById(R.id.imgView2);
+        ImageView img3 = view.findViewById(R.id.imgView3);
+        ImageView img4 = view.findViewById(R.id.imgView4);
+        ImageView img5 = view.findViewById(R.id.imgView5);
+        ImageView img6 = view.findViewById(R.id.imgView6);
+        ImageView img7 = view.findViewById(R.id.imgView7);
+        ImageView img8 = view.findViewById(R.id.imgView8);
+        ImageView img9 = view.findViewById(R.id.imgView9);
+        ImageView img10 = view.findViewById(R.id.imgView10);
+        ImageView img11 = view.findViewById(R.id.imgView11);
+        ImageView img12 = view.findViewById(R.id.imgView12);
+        ImageView img13 = view.findViewById(R.id.imgView13);
+        ImageView img14 = view.findViewById(R.id.imgView14);
+        ImageView img15 = view.findViewById(R.id.imgView15);
+
+        ArrayList<ImageView> imageViews = new ArrayList<>();
+        imageViews.add(img1);
+        imageViews.add(img2);
+        imageViews.add(img3);
+        imageViews.add(img4);
+        imageViews.add(img5);
+        imageViews.add(img6);
+        imageViews.add(img7);
+        imageViews.add(img8);
+        imageViews.add(img9);
+        imageViews.add(img10);
+        imageViews.add(img11);
+        imageViews.add(img12);
+        imageViews.add(img13);
+        imageViews.add(img14);
+        imageViews.add(img15);
+
+        int count = 0;
+        for(ImageView img : imageViews){
+            img.setBackgroundColor(colorArrayList.get(count));
+            count++;
+        }
+
+        img1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(0));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(1));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(2));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(3));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(4));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(5));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(6));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(7));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(8));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(9));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img11.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(10));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img12.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(11));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img13.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(12));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img14.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(13));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+        img15.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                artView.setDrawingColor(colorArrayList.get(14));
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogLineWidth.dismiss();
+                currentAlertDialog = null;
+            }
+        });
+
+        currentAlertDialog.setView(view);
+        dialogLineWidth = currentAlertDialog.create();
+        dialogLineWidth.setTitle("Select previously used color");
+        dialogLineWidth.show();
+    }
+
     // Color Dialog
     void showColorDialog(View v) {
         AmbilWarnaDialog dialog = new AmbilWarnaDialog(this, initialColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
@@ -177,7 +362,6 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             }
         });
         dialog.show();
-
     }
 
     // Line width seekbar listener
@@ -276,5 +460,28 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             }
         }
         return super.isFinishing();
+    }
+
+    private ArrayList<Integer> setUpColors(){
+        ArrayList<Integer> temp = new ArrayList<>();
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+        temp.add( -16777216);
+
+        return temp;
     }
 }
