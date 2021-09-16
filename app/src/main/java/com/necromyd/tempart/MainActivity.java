@@ -23,6 +23,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button newArt, gallery, openEdit;
+    ImageView about;
     final int IMAGE = 1;
 
     @Override
@@ -34,15 +35,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newArt = (Button) findViewById(R.id.btn_mainArt);
         gallery = (Button) findViewById(R.id.btn_mainGallery);
         openEdit = (Button) findViewById(R.id.btn_editFromGallery);
+        about = (ImageView) findViewById(R.id.img_about);
         newArt.setOnClickListener(this);
         gallery.setOnClickListener(this);
         openEdit.setOnClickListener(this);
+        about.setOnClickListener(this);
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     @Override
@@ -59,11 +57,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_editFromGallery:
                 pickAnImage();
                 break;
+            case R.id.img_about:
+                Intent c = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(c);
+                break;
         }
     }
 
     @Override
-
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public static String getPath(Context context, Uri uri ) {
+    private static String getPath(Context context, Uri uri ) {
         String result = null;
         String[] proj = { MediaStore.Images.Media.DATA };
         Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
@@ -101,10 +102,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return result;
     }
 
-    public void pickAnImage() {
+    private void pickAnImage() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, IMAGE);
     }
-
 
 }

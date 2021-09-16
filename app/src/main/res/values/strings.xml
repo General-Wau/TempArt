@@ -24,5 +24,17 @@
     <string name="new_art">New Art</string>
     <string name="temp_art">TEMP ART</string>
     <string name="cancel">Cancel</string>
+    <string name="about">- About</string>
+    <string name="q_amp_a">- <![CDATA[Q&A]]></string>
+    <string name="contents">Contents :</string>
+    <string name="about_text">TempArt was created by Necromyd as a pet project while learning android development. My intention is to improve the app as I my skills improve. My apologies if some features might not be present for the time being. Feel free to write some feedback in the play store reviews.\n Thanks for giving TempArt a try !</string>
+    <string name="a1">The eraser was originally present in the code, but its implementation proved incompatible with layers, undo and redo features which made me disable it temporarily. It will be added in the future alongside eyedropper tool. Feel free to erase with white color or use the undo feature.</string>
+    <string name="q1">- Where is the eraser ?</string>
+    <string name="Q_A"><![CDATA[Q & A]]></string>
+    <string name="about_tempart">About TempArt</string>
+    <string name="q2">- Does this app requires internet connection ?</string>
+    <string name="a2">No. Internet connection is not required in order to use this application.</string>
+    <string name="q3">- Who is the snake character ?</string>
+    <string name="a3">His name is Snek and he is the mascot of TempArt!</string>
 
 </resources>
