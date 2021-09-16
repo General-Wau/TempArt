@@ -1,188 +1,110 @@
 package com.necromyd.tempart;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SeekBar;
+import android.widget.Toast;
 
-import com.necromyd.tempart.view.ArtView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.IOException;
 
-    private ArtView artView;
-    private AlertDialog.Builder currentAlertDialog;
-    private ImageView widthImageView;
-    private AlertDialog dialogLineWidth;
-    private AlertDialog colorDialog;
-    private SeekBar alphaSeekBar;
-    private SeekBar redSeekBar;
-    private SeekBar greenSeekBar;
-    private SeekBar blueSeekBar;
-    private View colorView;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    Button newArt, gallery, openEdit;
+    ImageView about;
+    final int IMAGE = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        artView = findViewById(R.id.artView);
+        newArt = (Button) findViewById(R.id.btn_mainArt);
+        gallery = (Button) findViewById(R.id.btn_mainGallery);
+        openEdit = (Button) findViewById(R.id.btn_editFromGallery);
+        about = (ImageView) findViewById(R.id.img_about);
+        newArt.setOnClickListener(this);
+        gallery.setOnClickListener(this);
+        openEdit.setOnClickListener(this);
+        about.setOnClickListener(this);
+
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_mainArt:
+                Intent a = new Intent(getApplicationContext(), ArtActivity.class);
+                startActivity(a);
+                break;
+            case R.id.btn_mainGallery:
+                Intent b = new Intent(getApplicationContext(), GalleryActivity.class);
+                startActivity(b);
+                break;
+            case R.id.btn_editFromGallery:
+                pickAnImage();
+                break;
+            case R.id.img_about:
+                Intent c = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(c);
+                break;
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
 
-        switch (item.getItemId()) {
-            case R.id.clearid:
-                artView.clear();
-                break;
-            case R.id.saveid:
-                artView.saveImage();
-                break;
-            case R.id.colorid:
-                showColorDialog();
-                break;
-            case R.id.lineWidth:
-                showLineWidthDialog();
-                break;
-            case R.id.eraseid:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+        super.onActivityResult(requestCode, resultCode, data);
 
-    void showLineWidthDialog() {
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.width_dialog, null);
-        final SeekBar widthSeekbar = view.findViewById(R.id.seekBarId);
-        widthSeekbar.setProgress(artView.getLineWidth());
-        Button setLineWidthButton = view.findViewById(R.id.buttonDialogId);
-        widthImageView = view.findViewById(R.id.imageViewId);
-        setLineWidthButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setLineWidth(widthSeekbar.getProgress());
-                dialogLineWidth.dismiss();
-                currentAlertDialog = null;
+        if (resultCode == RESULT_OK && requestCode == IMAGE && data!=null){
+            Uri selectedImageUri = data.getData( );
+            String picturePath = getPath( getApplicationContext(), selectedImageUri );
+            Log.d("Picture Path", picturePath);
+
+            if(picturePath != null){
+                Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
+                intent.putExtra("image", picturePath);
+                startActivity(intent);
+//                finish();
+            }else{
+                Toast.makeText(MainActivity.this, "Intent is null", Toast.LENGTH_SHORT).show();
             }
-        });
-
-        widthSeekbar.setOnSeekBarChangeListener(widthSeekBarChange);
-        currentAlertDialog.setView(view);
-        dialogLineWidth = currentAlertDialog.create();
-        dialogLineWidth.setTitle("Set Line Width");
-        dialogLineWidth.show();
+        }
     }
 
-    void showColorDialog(){
-        currentAlertDialog = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
-        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
-        redSeekBar = view.findViewById(R.id.redSeekBar);
-        greenSeekBar = view.findViewById(R.id.greenSeekBar);
-        blueSeekBar = view.findViewById(R.id.blueSeekBar);
-        colorView = view.findViewById(R.id.colorView);
-
-        //register SeekBar event Listeners
-        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
-
-        int color = artView.getDrawingColor();
-        alphaSeekBar.setProgress(Color.alpha(color));
-        redSeekBar.setProgress(Color.red(color));
-        greenSeekBar.setProgress(Color.green(color));
-        blueSeekBar.setProgress(Color.blue(color));
-
-        Button setColorButton = view.findViewById(R.id.setColorButton);
-        setColorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                artView.setDrawingColor(Color.argb(
-                        alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(),blueSeekBar.getProgress()
-                ));
-
-                colorDialog.dismiss();
+    private static String getPath(Context context, Uri uri ) {
+        String result = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
+        if(cursor != null){
+            if ( cursor.moveToFirst( ) ) {
+                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
+                result = cursor.getString( column_index );
             }
-        });
-
-        currentAlertDialog.setView(view);
-        currentAlertDialog.setTitle("Choose Color");
-        colorDialog = currentAlertDialog.create();
-        colorDialog.show();
+            cursor.close( );
+        }
+        if(result == null) {
+            result = "Not found";
+        }
+        return result;
     }
 
-    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener(){
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            artView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
-            ));
+    private void pickAnImage() {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, IMAGE);
+    }
 
-            //display the current color
-            colorView.setBackgroundColor(Color.argb(
-                    alphaSeekBar.getProgress(),redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(),blueSeekBar.getProgress()
-            ));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener() {
-        Bitmap bitmap = Bitmap.createBitmap(300,100, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            Paint p = new Paint();
-            p.setColor(artView.getDrawingColor());
-            p.setStrokeCap(Paint.Cap.ROUND);
-            p.setStrokeWidth(progress);
-
-            bitmap.eraseColor(Color.WHITE);
-            canvas.drawLine(10,50, 287,50, p);
-            widthImageView.setImageBitmap(bitmap);
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
 }
