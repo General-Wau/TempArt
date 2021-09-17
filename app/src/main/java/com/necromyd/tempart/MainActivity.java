@@ -1,12 +1,15 @@
 package com.necromyd.tempart;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -15,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         gallery.setOnClickListener(this);
         openEdit.setOnClickListener(this);
         about.setOnClickListener(this);
-
     }
 
     @Override
@@ -65,46 +68,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK && requestCode == IMAGE && data!=null){
-            Uri selectedImageUri = data.getData( );
-            String picturePath = getPath( getApplicationContext(), selectedImageUri );
+        if (resultCode == RESULT_OK && requestCode == IMAGE && data != null) {
+            Uri selectedImageUri = data.getData();
+            String picturePath = getPath(getApplicationContext(), selectedImageUri);
             Log.d("Picture Path", picturePath);
 
-            if(picturePath != null){
+            if (picturePath != null) {
                 Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
                 intent.putExtra("image", picturePath);
                 startActivity(intent);
-//                finish();
-            }else{
-                Toast.makeText(MainActivity.this, "Intent is null", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                finish();
             }
         }
     }
 
-    private static String getPath(Context context, Uri uri ) {
+    private static String getPath(Context context, Uri uri) {
         String result = null;
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
-        if(cursor != null){
-            if ( cursor.moveToFirst( ) ) {
-                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
-                result = cursor.getString( column_index );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    int column_index = cursor.getColumnIndexOrThrow(proj[0]);
+                    result = cursor.getString(column_index);
+                }
+                cursor.close();
             }
-            cursor.close( );
-        }
-        if(result == null) {
-            result = "Not found";
+            if (result == null) {
+                result = "Not found";
+            }
+        } else {
+            Toast.makeText(context.getApplicationContext(), "Failed to get image path , permission problem ?", Toast.LENGTH_SHORT).show();
         }
         return result;
     }
 
     private void pickAnImage() {
-        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(gallery, IMAGE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, 1000);
+        }else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
+        }
+        else{
+            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            startActivityForResult(gallery, IMAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(gallery, IMAGE);
+            }else {
+                Toast.makeText(MainActivity.this, "Permission Denied !", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

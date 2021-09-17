@@ -115,6 +115,8 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+
+
     //Handle tool buttons
     @Override
     public void onClick(View v) {

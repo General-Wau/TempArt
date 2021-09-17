@@ -1,10 +1,13 @@
 package com.necromyd.tempart;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -296,7 +299,6 @@ public class ArtView extends View {
         try {
             fileOutputStream = new FileOutputStream(myPath);
             //Use the compress method on the BitMap object to write image to the OutputStream
-
 //            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             draw(canvas);
@@ -326,22 +328,22 @@ public class ArtView extends View {
         // Determine the constrained dimension, which determines both dimensions.
         int width;
         int height;
-        float widthRatio = (float)bitmap.getWidth() / maxWidth;
-        float heightRatio = (float)bitmap.getHeight() / maxHeight;
+        float widthRatio = (float) bitmap.getWidth() / maxWidth;
+        float heightRatio = (float) bitmap.getHeight() / maxHeight;
         // Width constrained.
         if (widthRatio >= heightRatio) {
             width = maxWidth;
-            height = (int)(((float)width / bitmap.getWidth()) * bitmap.getHeight());
+            height = (int) (((float) width / bitmap.getWidth()) * bitmap.getHeight());
         }
         // Height constrained.
         else {
             height = maxHeight;
-            width = (int)(((float)height / bitmap.getHeight()) * bitmap.getWidth());
+            width = (int) (((float) height / bitmap.getHeight()) * bitmap.getWidth());
         }
         Bitmap scaledBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
-        float ratioX = (float)width / bitmap.getWidth();
-        float ratioY = (float)height / bitmap.getHeight();
+        float ratioX = (float) width / bitmap.getWidth();
+        float ratioY = (float) height / bitmap.getHeight();
         float middleX = width / 2.0f;
         float middleY = height / 2.0f;
         Matrix scaleMatrix = new Matrix();
@@ -352,6 +354,4 @@ public class ArtView extends View {
         canvas.drawBitmap(bitmap, middleX - bitmap.getWidth() / 2, middleY - bitmap.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
         return scaledBitmap;
     }
-
-
 }

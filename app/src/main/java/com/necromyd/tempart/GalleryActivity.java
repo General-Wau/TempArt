@@ -20,8 +20,9 @@ import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity {
 
-    List <Cell> allFilesPaths;
-    String path;
+    private List <Cell> allFilesPaths;
+    private boolean askAgain;
+    // path converted to local variable
 
     @Override
     protected void onPostResume() {
@@ -34,22 +35,16 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        askAgain = false;
 
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED){
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
-        }else{
-            showImages();
-        }
-
-
+        askPermission();
     }
 
     // show the images on the screen
     private void showImages(){
         // this is the folder with all the images
         ContextWrapper cw = new ContextWrapper(this);
-        path = cw.getDir("files", Context.MODE_PRIVATE).toString();
+        String path = cw.getDir("files", Context.MODE_PRIVATE).toString();
         allFilesPaths = new ArrayList<>();
         allFilesPaths = listAllFiles(path);
 
@@ -100,12 +95,28 @@ public class GalleryActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1000) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //show images
+                askAgain = false;
                 showImages();
-            } else {
+            }else if (askAgain){
+                askPermission();
+            }
+            else {
                 Toast.makeText(this, "Permission not granted!", Toast.LENGTH_SHORT).show();
+                askAgain = true;
                 finish();
             }
+        }
+    }
+
+    private void askPermission(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, 1000);
+        }else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
+        } else{
+            showImages();
         }
     }
 
