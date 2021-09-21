@@ -1,12 +1,16 @@
 package com.necromyd.tempart;
 
+import static androidx.core.app.ActivityCompat.requestPermissions;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -15,9 +19,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -26,13 +30,19 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ArtView extends View {
 
@@ -74,7 +84,7 @@ public class ArtView extends View {
 
         if (bitmap != null) {
             loadedBitmap = scale(bitmap, width, height);
-        }else {
+        } else {
             this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888, true);
         }
         tPaintline = new Paint();
@@ -96,7 +106,7 @@ public class ArtView extends View {
         canvas.save();
         if (loadedBitmap != null) {
             canvas.drawBitmap(loadedBitmap, 0, 0, paintLine);
-            canvas.clipRect(0,0,loadedBitmap.getWidth(),loadedBitmap.getHeight());
+            canvas.clipRect(0, 0, loadedBitmap.getWidth(), loadedBitmap.getHeight());
         } else {
             canvas.drawBitmap(bitmap, 0, 0, tPaintline);
         }
@@ -192,6 +202,7 @@ public class ArtView extends View {
     public ArrayList<Brush> getPath() {
         return path;
     }
+
     public void setDrawingColor(int color) {
         paintLine.setColor(color);
         ArtActivity.fab.setBackgroundTintList(ColorStateList.valueOf(color));
@@ -200,7 +211,8 @@ public class ArtView extends View {
         ArtActivity.colorArrayList.remove(0);
         ArtActivity.colorArrayList.add(color);
     }
-//    public void dropSelectColor(View v) {
+
+    //    public void dropSelectColor(View v) {
 ////        this.setDrawingCacheEnabled(true);
 //        v.setOnTouchListener(new OnTouchListener() {
 //            @Override
@@ -221,7 +233,15 @@ public class ArtView extends View {
         clearConfirm.setPositiveButton("Save and Clear", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveImage();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    try {
+                        saveImageQ();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    saveImageOldApi();
+                }
                 layer1.clear();
                 layer2.clear();
                 layer3.clear();
@@ -247,6 +267,7 @@ public class ArtView extends View {
         AlertDialog dialog = clearConfirm.create();
         dialog.show();
     }
+
     public void changeLayer() {
 
         if (layer == 1) {
@@ -263,12 +284,15 @@ public class ArtView extends View {
             ArtActivity.btn_layers.setImageResource(R.drawable.ic_baseline_layer1);
         }
     }
+
     public int getLineWidth() {
         return (int) paintLine.getStrokeWidth();
     }
+
     public int getDrawingColor() {
         return paintLine.getColor();
     }
+
     public void redo() {
         if (undo.size() > 0) {
             path.add(undo.remove(undo.size() - 1));
@@ -277,6 +301,7 @@ public class ArtView extends View {
             Snackbar.make(this, "Nothing to redo !", Snackbar.LENGTH_SHORT).show();
         }
     }
+
     public void undo() {
         if (path.size() > 0) {
             undo.add(path.remove(path.size() - 1));
@@ -285,8 +310,9 @@ public class ArtView extends View {
             Snackbar.make(this, "Nothing to undo in this layer !", Snackbar.LENGTH_SHORT).show();
         }
     }
+
     @SuppressLint("WrongThread")
-    public void saveImage() {
+    public void saveImageOldApi() {
         ContextWrapper cw = new ContextWrapper(getContext());
         String filename = "TempART" + System.currentTimeMillis();
         // path to /data/data/your app/app_data/imageDir
@@ -303,7 +329,16 @@ public class ArtView extends View {
             Canvas canvas = new Canvas(bitmap);
             draw(canvas);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-            MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename , "made with TempArt");
+            if(ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                    PackageManager.PERMISSION_GRANTED){
+                MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
+            }else{
+                requestPermissions((Activity) context,
+                        new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                        100);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -321,6 +356,37 @@ public class ArtView extends View {
         }
 
         imageSaved = true;
+    }
+
+    public void saveImageQ() throws IOException {
+        String name = "TempART" + System.currentTimeMillis();
+        OutputStream fos;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name + ".jpg");
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+
+            Canvas canvas = new Canvas(bitmap);
+            draw(canvas);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            Objects.requireNonNull(fos).close();
+
+            Toast message = Toast.makeText(getContext(), "Image Saved", Toast.LENGTH_LONG);
+            message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
+            message.show();
+            imageSaved = true;
+        } else {
+//            String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+//            File image = new File(imagesDir, name + ".jpg");
+//            fos = new FileOutputStream(image);
+            Toast message = Toast.makeText(getContext(), "Failed to save image", Toast.LENGTH_LONG);
+            message.show();
+        }
+
     }
 
     // Scale a bitmap preserving the aspect ratio.

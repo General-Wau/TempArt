@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (resultCode == RESULT_OK && requestCode == IMAGE && data != null) {
             Uri selectedImageUri = data.getData();
             String picturePath = getPath(getApplicationContext(), selectedImageUri);
-            Log.d("Picture Path", picturePath);
+//            Log.d("Picture Path", picturePath);
 
             if (picturePath != null) {
                 Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 result = "Not found";
             }
         } else {
+            // handle earlier versions here !------------------------------------------------------ < ------------------------------------------ < --------------
             Toast.makeText(context.getApplicationContext(), "Failed to get image path , permission problem ?", Toast.LENGTH_SHORT).show();
         }
         return result;

@@ -12,11 +12,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +24,7 @@ import android.widget.SeekBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
@@ -132,7 +133,16 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId() == R.id.btn_clear){
             artView.clear();
         } else if (v.getId() == R.id.btn_save){
-            artView.saveImage();
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                try{
+                    artView.saveImageQ();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                artView.saveImageOldApi();
+            }
+
         }
 //        else if (v.getId() == R.id.btn_eraser){
 //            artView.erase(true);
@@ -411,7 +421,15 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    artView.saveImage();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                        try{
+                            artView.saveImageQ();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        artView.saveImageOldApi();
+                    }
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
                     ArtActivity.super.onBackPressed();
@@ -446,7 +464,15 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
             if (!declinedToSaveImage & !artView.imageSaved) {
-                artView.saveImage();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                    try{
+                        artView.saveImageQ();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    artView.saveImageOldApi();
+                }
             }
         }
         super.onStop();
@@ -458,7 +484,15 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
             if (!declinedToSaveImage & !artView.imageSaved) {
-                artView.saveImage();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                    try{
+                        artView.saveImageQ();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    artView.saveImageOldApi();
+                }
             }
         }
         return super.isFinishing();
