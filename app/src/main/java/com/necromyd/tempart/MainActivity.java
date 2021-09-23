@@ -81,8 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
                 intent.putExtra("image", picturePath);
                 startActivity(intent);
-            }
-            else{
+            } else {
                 finish();
             }
         }
@@ -90,35 +89,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static String getPath(Context context, Uri uri) {
         String result = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    int column_index = cursor.getColumnIndexOrThrow(proj[0]);
-                    result = cursor.getString(column_index);
-                }
-                cursor.close();
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(proj[0]);
+                result = cursor.getString(column_index);
             }
-            if (result == null) {
-                result = "Not found";
-            }
-        } else {
-            // handle earlier versions here !------------------------------------------------------ < ------------------------------------------ < --------------
-            Toast.makeText(context.getApplicationContext(), "Failed to get image path , permission problem ?", Toast.LENGTH_SHORT).show();
+            cursor.close();
+        }
+        else {
+            Toast.makeText(context.getApplicationContext(), "Failed to get image path , result is null or permission problem ?", Toast.LENGTH_SHORT).show();
+            result = "Not found";
         }
         return result;
     }
 
     private void pickAnImage() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, 1000);
-        }else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED){
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
-        }
-        else{
+        } else {
             Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
             startActivityForResult(gallery, IMAGE);
         }
@@ -131,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, IMAGE);
-            }else {
+            } else {
                 Toast.makeText(MainActivity.this, "Permission Denied !", Toast.LENGTH_SHORT).show();
             }
         }
