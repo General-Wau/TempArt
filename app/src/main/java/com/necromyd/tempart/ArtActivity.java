@@ -133,16 +133,11 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId() == R.id.btn_clear){
             artView.clear();
         } else if (v.getId() == R.id.btn_save){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                try{
-                    artView.saveImageQ();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }else{
-                artView.saveImageOldApi();
+            try {
+                artView.saveImage();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
         }
 //        else if (v.getId() == R.id.btn_eraser){
 //            artView.erase(true);
@@ -421,15 +416,12 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
             yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                        try{
-                            artView.saveImageQ();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }else{
-                        artView.saveImageOldApi();
+                    try {
+                        artView.saveImage();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+
                     dialogLineWidth.dismiss();
                     currentAlertDialog = null;
                     ArtActivity.super.onBackPressed();
@@ -464,14 +456,10 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
             if (!declinedToSaveImage & !artView.imageSaved) {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                    try{
-                        artView.saveImageQ();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }else{
-                    artView.saveImageOldApi();
+                try {
+                    artView.saveImage();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -484,14 +472,10 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         Log.d(TAG, "onDestroy");
         if (!artView.getPath().isEmpty()) {
             if (!declinedToSaveImage & !artView.imageSaved) {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                    try{
-                        artView.saveImageQ();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }else{
-                    artView.saveImageOldApi();
+                try {
+                    artView.saveImage();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

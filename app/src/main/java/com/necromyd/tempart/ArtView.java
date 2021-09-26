@@ -233,14 +233,10 @@ public class ArtView extends View {
         clearConfirm.setPositiveButton("Save and Clear", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    try {
-                        saveImageQ();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    saveImageOldApi();
+                try {
+                    saveImage();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 layer1.clear();
                 layer2.clear();
@@ -311,82 +307,69 @@ public class ArtView extends View {
         }
     }
 
+    // This is for api <28, it saves two copies, one in internal private directory and one in the public phone gallery
     @SuppressLint("WrongThread")
-    public void saveImageOldApi() {
+    public void saveImage() throws IOException {
         ContextWrapper cw = new ContextWrapper(getContext());
         String filename = "TempART" + System.currentTimeMillis();
-        // path to /data/data/your app/app_data/imageDir
         File directory = cw.getDir("files", Context.MODE_PRIVATE);
         pathString = cw.getDir("files", Context.MODE_PRIVATE).toString();
-        // create imageDir
         File myPath = new File(directory, filename + ".jpg");
-
         FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(myPath);
-            //Use the compress method on the BitMap object to write image to the OutputStream
-//            Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            draw(canvas);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-            if(ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                    PackageManager.PERMISSION_GRANTED){
-                MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
-            }else{
-                requestPermissions((Activity) context,
-                        new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                        100);
-            }
+        fileOutputStream = new FileOutputStream(myPath);
+        Canvas canvas = new Canvas(bitmap);
+        draw(canvas);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                assert fileOutputStream != null;
-                fileOutputStream.flush();
-                fileOutputStream.close();
-                Log.d("Image:", directory.getAbsolutePath());
-                Toast message = Toast.makeText(getContext(), "Image Saved +" + directory.getAbsolutePath(), Toast.LENGTH_LONG);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            OutputStream fos;
+                ContentResolver resolver = context.getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename + ".jpg");
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+                draw(canvas);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                Objects.requireNonNull(fos).close();
+                Toast message = Toast.makeText(getContext(), "Image Saved", Toast.LENGTH_LONG);
                 message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
                 message.show();
-            } catch (IOException e) {
+//            MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
+                imageSaved = true;
+        } else {
+            try {
+                if(ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED){
+
+                    MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
+                    addImageToGallery(myPath.getPath(), context);
+
+                    imageSaved = true;
+                }else{
+                    requestPermissions((Activity) context,
+                            new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                            100);
+                }
+
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    assert fileOutputStream != null;
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    Log.d("Image:", directory.getAbsolutePath());
+                    Toast message = Toast.makeText(getContext(), "Image Saved +" + directory.getAbsolutePath(), Toast.LENGTH_LONG);
+                    message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
+                    message.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-        imageSaved = true;
-    }
-
-    public void saveImageQ() throws IOException {
-        String name = "TempART" + System.currentTimeMillis();
-        OutputStream fos;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContentResolver resolver = context.getContentResolver();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name + ".jpg");
-            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
-            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-            fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
-
-            Canvas canvas = new Canvas(bitmap);
-            draw(canvas);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            Objects.requireNonNull(fos).close();
-
-            Toast message = Toast.makeText(getContext(), "Image Saved", Toast.LENGTH_LONG);
-            message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
-            message.show();
-            imageSaved = true;
-        } else {
-//            String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-//            File image = new File(imagesDir, name + ".jpg");
-//            fos = new FileOutputStream(image);
-            Toast message = Toast.makeText(getContext(), "Failed to save image", Toast.LENGTH_LONG);
-            message.show();
-        }
-
     }
 
     // Scale a bitmap preserving the aspect ratio.
@@ -420,4 +403,17 @@ public class ArtView extends View {
         canvas.drawBitmap(bitmap, middleX - bitmap.getWidth() / 2, middleY - bitmap.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
         return scaledBitmap;
     }
+
+    public static void addImageToGallery(final String filePath, final Context context) {
+
+        ContentValues values = new ContentValues();
+
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, filePath);
+
+        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
 }
+
+
