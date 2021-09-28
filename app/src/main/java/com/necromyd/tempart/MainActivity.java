@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button newArt, gallery, openEdit;
     ImageView about;
     final int IMAGE = 1;
+    public static final String TAG = "MyActivity";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(b);
                 break;
             case R.id.btn_editFromGallery:
+                Log.d(TAG, "Button Click");
                 pickAnImage();
                 break;
             case R.id.img_about:
@@ -73,17 +75,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && requestCode == IMAGE && data != null) {
+            Log.d(TAG, "Data from picked image is not null, creating uri and path");
             Uri selectedImageUri = data.getData();
             String picturePath = getPath(getApplicationContext(), selectedImageUri);
 //            Log.d("Picture Path", picturePath);
 
             if (picturePath != null) {
+                Log.d(TAG, "Path creating success, calling art activity");
                 Intent intent = new Intent(getApplicationContext(), ArtActivity.class);
                 intent.putExtra("image", picturePath);
                 startActivity(intent);
             } else {
+                Log.d(TAG, "Path was null");
                 finish();
             }
+        }else{
+            Log.d(TAG, "Data seems to be null, aborting");
         }
     }
 
@@ -95,25 +102,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (cursor.moveToFirst()) {
                 int column_index = cursor.getColumnIndexOrThrow(proj[0]);
                 result = cursor.getString(column_index);
+                Toast.makeText(context, "" + result, Toast.LENGTH_SHORT).show();
             }
             cursor.close();
         }
         else {
             Toast.makeText(context.getApplicationContext(), "Failed to get image path , result is null or permission problem ?", Toast.LENGTH_SHORT).show();
             result = "Not found";
+            Toast.makeText(context, "" + result, Toast.LENGTH_SHORT).show();
         }
         return result;
     }
 
     private void pickAnImage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, 1000);
+            Log.d(TAG, "SDK >= Q , requesting permission");
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "SDK < Q , requesting permission");
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
         } else {
-            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            Log.d(TAG, "Permission exists, starting pick intent");
+            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(gallery, IMAGE);
         }
     }
@@ -122,10 +134,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1000) {
+            Log.d(TAG, "result code good");
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                Log.d(TAG, "Permission is granted, starting pick");
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, IMAGE);
             } else {
+                Log.d(TAG, "While result code is good, permission was denied");
                 Toast.makeText(MainActivity.this, "Permission Denied !", Toast.LENGTH_SHORT).show();
             }
         }

@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -107,9 +108,18 @@ public class ArtActivity extends AppCompatActivity implements View.OnClickListen
         if (extras != null) {
             if (extras.getString("image") != null) {
                 String path = extras.getString("image");
-                Bitmap myBitmap = BitmapFactory.decodeFile(path);
-                myBitmap = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
-                artView.init(metrics, myBitmap);
+                Log.d(TAG, "Extracted path is " + path + " trying to create a bitmap");
+                try{
+                    Bitmap myBitmap = BitmapFactory.decodeFile(path);
+                    myBitmap = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                    Log.d(TAG, "Bitmap created, launching art view");
+                    artView.init(metrics, myBitmap);
+                }catch (Exception e){
+                    Log.d(TAG, "Bitmap creation falied");
+                    e.printStackTrace();
+                    Toast.makeText(ArtActivity.this, "Failed to create bitmap object in Art Activity", Toast.LENGTH_SHORT).show();
+                }
+
             }
         } else {
             artView.init(metrics, null);
