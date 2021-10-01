@@ -315,11 +315,13 @@ public class ArtView extends View {
         File directory = cw.getDir("files", Context.MODE_PRIVATE);
         pathString = cw.getDir("files", Context.MODE_PRIVATE).toString();
         File myPath = new File(directory, filename + ".jpg");
-        FileOutputStream fileOutputStream = null;
-        fileOutputStream = new FileOutputStream(myPath);
-        Canvas canvas = new Canvas(bitmap);
-        draw(canvas);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+        FileOutputStream fileOutputStream = new FileOutputStream(myPath);
+        Canvas canvas;
+        if(loadedBitmap != null){
+            canvas = new Canvas(loadedBitmap);
+        } else{
+            canvas = new Canvas(bitmap);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             OutputStream fos;
@@ -331,7 +333,11 @@ public class ArtView extends View {
                 Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
                 draw(canvas);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                if(loadedBitmap != null){
+                    loadedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                }else{
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                }
                 Objects.requireNonNull(fos).close();
                 Toast message = Toast.makeText(getContext(), "Image Saved", Toast.LENGTH_LONG);
                 message.setGravity(Gravity.BOTTOM, message.getXOffset() / 2, message.getYOffset() / 2);
@@ -344,9 +350,14 @@ public class ArtView extends View {
                         context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED){
 
-                    MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
-                    addImageToGallery(myPath.getPath(), context);
+                    draw(canvas);
+                    if(loadedBitmap != null){
+                        MediaStore.Images.Media.insertImage(context.getContentResolver(), loadedBitmap, filename, "made with TempArt");
+                    }else{
+                        MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, filename, "made with TempArt");
+                    }
 
+                    addImageToGallery(myPath.getPath(), context);
                     imageSaved = true;
                 }else{
                     requestPermissions((Activity) context,
@@ -358,7 +369,6 @@ public class ArtView extends View {
                 e.printStackTrace();
             } finally {
                 try {
-                    assert fileOutputStream != null;
                     fileOutputStream.flush();
                     fileOutputStream.close();
                     Log.d("Image:", directory.getAbsolutePath());
